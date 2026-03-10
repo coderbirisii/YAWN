@@ -17,15 +17,7 @@
   </p>
 </p>
 
-## ⭐ Project Stats
 
-<div align="center">
-
-[![Star History Chart](https://api.star-history.com/svg?repos=coderbirisii/YAWN&type=Date)](https://star-history.com/#coderbirisii/YAWN&Date)
-
-![Repobeats analytics image](https://repobeats.axiom.co/api/embed/ddaa9df9a94b0029ec3fad399e1c1c4e75755477.svg "Repobeats analytics image")
-
-</div>
 
 <br />
 
@@ -99,6 +91,15 @@ To get the app up and running follow these simple steps.
 ## Roadmap and Known Bugs
 
 Please check the [issues tab](https://github.com/coderbirisii/YAWN/issues) before making a new issue.
+
+## ⭐ Project Stats
+
+<div align="center">
+
+[![Star History Chart](https://api.star-history.com/svg?repos=coderbirisii/YAWN&type=Date)](https://star-history.com/#coderbirisii/YAWN&Date)
+
+
+</div>
 
 ## Built With
 
