@@ -1,4 +1,4 @@
-﻿using System.Windows;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Threading;
 using FontAwesome6.Fonts;
@@ -8,6 +8,7 @@ namespace NOWT.Views;
 
 public partial class Home : UserControl
 {
+    public static ImageAwesome RiotStatus;
     public static ImageAwesome ValorantStatus;
     public static ImageAwesome AccountStatus;
     public static ImageAwesome MatchStatus;
@@ -17,6 +18,7 @@ public partial class Home : UserControl
         InitializeComponent();
         DataContextChanged += DataContextChangedHandler;
 
+        RiotStatus = RiotStatusView;
         ValorantStatus = ValorantStatusView;
         AccountStatus = AccountStatusView;
         MatchStatus = MatchStatusView;

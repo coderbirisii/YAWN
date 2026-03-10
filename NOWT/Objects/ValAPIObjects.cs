@@ -33,7 +33,7 @@ public class VapiVersion
     public string Version { get; set; }
 
     [JsonPropertyName("buildVersion")]
-    public long BuildVersion { get; set; }
+    public string BuildVersion { get; set; }
 
     [JsonPropertyName("riotClientVersion")]
     public string RiotClientVersion { get; set; }
@@ -399,4 +399,97 @@ public class ValApiLocresResponse
 
     [JsonPropertyName("data")]
     public Dictionary<string, Dictionary<string, string>> Data { get; set; }
+}
+
+public class ValApiBuddiesResponse
+{
+    [JsonPropertyName("status")]
+    public int Status { get; set; }
+
+    [JsonPropertyName("data")]
+    public ValApiBuddyLevel[] Data { get; set; }
+}
+
+public class ValApiBuddyLevel
+{
+    [JsonPropertyName("uuid")]
+    public Guid Uuid { get; set; }
+
+    [JsonPropertyName("charmLevel")]
+    public int CharmLevel { get; set; }
+
+    [JsonPropertyName("displayName")]
+    public string DisplayName { get; set; }
+
+    [JsonPropertyName("displayIcon")]
+    public Uri DisplayIcon { get; set; }
+
+    [JsonPropertyName("assetPath")]
+    public string AssetPath { get; set; }
+}
+
+public class ValApiPlayerTitlesResponse
+{
+    [JsonPropertyName("status")]
+    public int Status { get; set; }
+
+    [JsonPropertyName("data")]
+    public ValApiPlayerTitle[] Data { get; set; }
+}
+
+public class ValApiPlayerTitle
+{
+    [JsonPropertyName("uuid")]
+    public Guid Uuid { get; set; }
+
+    [JsonPropertyName("displayName")]
+    public string DisplayName { get; set; }
+
+    [JsonPropertyName("titleText")]
+    public string TitleText { get; set; }
+
+    [JsonPropertyName("isHiddenIfNotOwned")]
+    public bool IsHiddenIfNotOwned { get; set; }
+
+    [JsonPropertyName("assetPath")]
+    public string AssetPath { get; set; }
+}
+
+public class ValApiContentTiersResponse
+{
+    [JsonPropertyName("status")]
+    public int Status { get; set; }
+
+    [JsonPropertyName("data")]
+    public ValApiContentTier[] Data { get; set; }
+}
+
+public class ValApiContentTier
+{
+    [JsonPropertyName("uuid")]
+    public Guid Uuid { get; set; }
+
+    [JsonPropertyName("displayName")]
+    public string DisplayName { get; set; }
+
+    [JsonPropertyName("devName")]
+    public string DevName { get; set; }
+
+    [JsonPropertyName("rank")]
+    public int Rank { get; set; }
+
+    [JsonPropertyName("juiceValue")]
+    public int JuiceValue { get; set; }
+
+    [JsonPropertyName("juiceCost")]
+    public int JuiceCost { get; set; }
+
+    [JsonPropertyName("highlightColor")]
+    public string HighlightColor { get; set; }
+
+    [JsonPropertyName("displayIcon")]
+    public Uri DisplayIcon { get; set; }
+
+    [JsonPropertyName("assetPath")]
+    public string AssetPath { get; set; }
 }

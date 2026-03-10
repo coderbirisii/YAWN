@@ -1,6 +1,6 @@
-﻿using System;
+using System;
 using System.Windows;
-using Microsoft.Toolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace NOWT.Objects;
 
@@ -108,6 +108,12 @@ public partial class SkinData
     private string _ghostName;
 
     [ObservableProperty]
+    private Uri _banditImage;
+
+    [ObservableProperty]
+    private string _banditName;
+
+    [ObservableProperty]
     private Uri _guardianImage;
 
     [ObservableProperty]
@@ -211,6 +217,129 @@ public partial class SkinData
 
     [ObservableProperty]
     private string _vandalName;
+
+    [ObservableProperty]
+    private string _playerTitle;
+
+    [ObservableProperty]
+    private Uri _classicBuddyImage;
+
+    [ObservableProperty]
+    private string _classicBuddyName;
+
+    [ObservableProperty]
+    private Uri _shortyBuddyImage;
+
+    [ObservableProperty]
+    private string _shortyBuddyName;
+
+    [ObservableProperty]
+    private Uri _frenzyBuddyImage;
+
+    [ObservableProperty]
+    private string _frenzyBuddyName;
+
+    [ObservableProperty]
+    private Uri _ghostBuddyImage;
+
+    [ObservableProperty]
+    private string _ghostBuddyName;
+
+    [ObservableProperty]
+    private Uri _banditBuddyImage;
+
+    [ObservableProperty]
+    private string _banditBuddyName;
+
+    [ObservableProperty]
+    private Uri _sheriffBuddyImage;
+
+    [ObservableProperty]
+    private string _sheriffBuddyName;
+
+    [ObservableProperty]
+    private Uri _stingerBuddyImage;
+
+    [ObservableProperty]
+    private string _stingerBuddyName;
+
+    [ObservableProperty]
+    private Uri _spectreBuddyImage;
+
+    [ObservableProperty]
+    private string _spectreBuddyName;
+
+    [ObservableProperty]
+    private Uri _buckyBuddyImage;
+
+    [ObservableProperty]
+    private string _buckyBuddyName;
+
+    [ObservableProperty]
+    private Uri _judgeBuddyImage;
+
+    [ObservableProperty]
+    private string _judgeBuddyName;
+
+    [ObservableProperty]
+    private Uri _bulldogBuddyImage;
+
+    [ObservableProperty]
+    private string _bulldogBuddyName;
+
+    [ObservableProperty]
+    private Uri _guardianBuddyImage;
+
+    [ObservableProperty]
+    private string _guardianBuddyName;
+
+    [ObservableProperty]
+    private Uri _phantomBuddyImage;
+
+    [ObservableProperty]
+    private string _phantomBuddyName;
+
+    [ObservableProperty]
+    private Uri _vandalBuddyImage;
+
+    [ObservableProperty]
+    private string _vandalBuddyName;
+
+    [ObservableProperty]
+    private Uri _marshalBuddyImage;
+
+    [ObservableProperty]
+    private string _marshalBuddyName;
+
+    [ObservableProperty]
+    private Uri _outlawBuddyImage;
+
+    [ObservableProperty]
+    private string _outlawBuddyName;
+
+    [ObservableProperty]
+    private Uri _operatorBuddyImage;
+
+    [ObservableProperty]
+    private string _operatorBuddyName;
+
+    [ObservableProperty]
+    private Uri _aresBuddyImage;
+
+    [ObservableProperty]
+    private string _aresBuddyName;
+
+    [ObservableProperty]
+    private Uri _odinBuddyImage;
+
+    [ObservableProperty]
+    private string _odinBuddyName;
+
+    [ObservableProperty]
+    private Uri _meleeBuddyImage;
+
+    [ObservableProperty]
+    private string _meleeBuddyName;
 }
 
 [INotifyPropertyChanged]
@@ -267,6 +396,22 @@ public class ValNameImage
         );
 }
 
+public class ValGamemodeInfo
+{
+    public Guid Uuid { get; set; }
+    public string Name { get; set; }
+    public string AssetPath { get; set; }
+}
+
+public class ValContentTier
+{
+    public string Name { get; set; }
+    public string DevName { get; set; }
+    public int Rank { get; set; }
+    public string HighlightColor { get; set; }
+    public Uri Icon { get; set; }
+}
+
 [INotifyPropertyChanged]
 public partial class MatchDetails
 {
@@ -281,6 +426,9 @@ public partial class MatchDetails
 
     [ObservableProperty]
     private Uri _mapImage;
+
+    [ObservableProperty]
+    private string _serverName;
 }
 
 [INotifyPropertyChanged]

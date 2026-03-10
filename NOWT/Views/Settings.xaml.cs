@@ -28,20 +28,23 @@ public partial class Settings : UserControl
 
     private async Task CheckAuthAsync()
     {
-        AuthStatusBox.Text = Properties.Resources.Refreshing;
+        Application.Current.Dispatcher.Invoke(() => AuthStatusBox.Text = Properties.Resources.Refreshing);
         if (!await Checks.CheckLoginAsync().ConfigureAwait(false))
-            AuthStatusBox.Text = Properties.Resources.AuthStatusFail;
+            Application.Current.Dispatcher.Invoke(() => AuthStatusBox.Text = Properties.Resources.AuthStatusFail);
         else
-            AuthStatusBox.Text =
-                $"{Properties.Resources.AuthStatusAuthAs} {await GetNameServiceGetUsernameAsync(Constants.Ppuuid).ConfigureAwait(false)}";
+        {
+            var username = await GetNameServiceGetUsernameAsync(Constants.Ppuuid).ConfigureAwait(false);
+            Application.Current.Dispatcher.Invoke(() => AuthStatusBox.Text = $"{Properties.Resources.AuthStatusAuthAs} {username}");
+        }
     }
 
     private async void Button_Click1Async(object sender, RoutedEventArgs e)
     {
         string ProductVersion = System.Windows.Forms.Application.ProductVersion;
-        CurrentVersion.Text = ProductVersion;
+        var cleanVersion = ProductVersion.Split('+')[0];
+        CurrentVersion.Text = cleanVersion;
         LatestVersion.Text = await GetLatestVersionAsync().ConfigureAwait(false);
-        AutoUpdater.InstalledVersion = new Version(ProductVersion);
+        AutoUpdater.InstalledVersion = new Version(cleanVersion);
         AutoUpdater.Start(
             "https://raw.githubusercontent.com/pwall2222/NOWT/main/NOWT/VersionInfo.xml"
         );
@@ -58,14 +61,14 @@ public partial class Settings : UserControl
 
     private async void Button_Click2Async(object sender, RoutedEventArgs e)
     {
-        Mouse.OverrideCursor = Cursors.Wait;
+        Application.Current.Dispatcher.Invoke(() => Mouse.OverrideCursor = Cursors.Wait);
         await CheckAuthAsync().ConfigureAwait(false);
-        Mouse.OverrideCursor = Cursors.Arrow;
+        Application.Current.Dispatcher.Invoke(() => Mouse.OverrideCursor = Cursors.Arrow);
     }
 
     private async void Button_Click3Async(object sender, RoutedEventArgs e)
     {
-        Mouse.OverrideCursor = Cursors.Wait;
+        Application.Current.Dispatcher.Invoke(() => Mouse.OverrideCursor = Cursors.Wait);
         if (await Checks.CheckLocalAsync().ConfigureAwait(false))
         {
             await LocalLoginAsync().ConfigureAwait(false);
@@ -74,10 +77,10 @@ public partial class Settings : UserControl
         }
         else
         {
-            AuthStatusBox.Text = Properties.Resources.NoValGame;
+            Application.Current.Dispatcher.Invoke(() => AuthStatusBox.Text = Properties.Resources.NoValGame);
         }
 
-        Mouse.OverrideCursor = Cursors.Arrow;
+        Application.Current.Dispatcher.Invoke(() => Mouse.OverrideCursor = Cursors.Arrow);
     }
 
     private async void Button_Click4Async(object sender, RoutedEventArgs e)
@@ -126,7 +129,7 @@ public partial class Settings : UserControl
 
     private async void LanguageList_OnDropDownOpenedAsync(object sender, EventArgs e)
     {
-        Mouse.OverrideCursor = Cursors.Wait;
+        Application.Current.Dispatcher.Invoke(() => Mouse.OverrideCursor = Cursors.Wait);
         if (LanguageCombo.Items.Count == 0)
             foreach (var language in await GetAvailableCulturesAsync().ConfigureAwait(false))
             {
@@ -134,6 +137,6 @@ public partial class Settings : UserControl
                 _languageList.Add(language);
             }
 
-        Mouse.OverrideCursor = Cursors.Arrow;
+        Application.Current.Dispatcher.Invoke(() => Mouse.OverrideCursor = Cursors.Arrow);
     }
 }

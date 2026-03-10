@@ -1,0 +1,74 @@
+{
+    "endpoints": [
+        {
+            "method": "GET",
+            "name": "Level Borders",
+            "url": "https://valorant-api.com/v1/levelborders",
+            "description": "",
+            "parameters": [],
+            "responses": [
+                {
+                    "status_code": 200,
+                    "description": "Success",
+                    "schema": [
+                        "object {2}",
+                        "status int32",
+                        "data object[] {7}",
+                        "uuid string",
+                        "displayName string (localized)",
+                        "startingLevel int32",
+                        "levelNumber int32",
+                        "levelNumberAppearance string",
+                        "smallPlayerCardAppearance string",
+                        "assetPath string"
+                    ]
+                },
+                {
+                    "status_code": 400,
+                    "description": "Bad Request",
+                    "schema": [
+                        "object {2}",
+                        "status int32",
+                        "error string"
+                    ]
+                }
+            ],
+            "info": "Returns data and assets of all level borders"
+        },
+        {
+            "method": "GET",
+            "name": "Level Border by Uuid",
+            "url": "https://valorant-api.com/v1/levelborders/{levelborderUuid}",
+            "description": "",
+            "parameters": [],
+            "responses": [
+                {
+                    "status_code": 200,
+                    "description": "Success",
+                    "schema": [
+                        "object {2}",
+                        "status int32",
+                        "data object[] {7}",
+                        "uuid string",
+                        "displayName string (localized)",
+                        "startingLevel int32",
+                        "levelNumber int32",
+                        "levelNumberAppearance string",
+                        "smallPlayerCardAppearance string",
+                        "assetPath string"
+                    ]
+                },
+                {
+                    "status_code": 400,
+                    "description": "Bad Request",
+                    "schema": [
+                        "object {2}",
+                        "status int32",
+                        "error string"
+                    ]
+                }
+            ],
+            "info": "Returns data and assets of the requested level border"
+        }
+    ]
+}

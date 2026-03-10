@@ -1,10 +1,11 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Threading;
-using Microsoft.Toolkit.Mvvm.ComponentModel;
-using Microsoft.Toolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using NOWT.Helpers;
 using NOWT.Objects;
 
@@ -36,6 +37,9 @@ public partial class MatchViewModel : ObservableObject
     [ObservableProperty]
     private List<Player> _rightPlayerList;
 
+    [ObservableProperty]
+    private bool _isMatchActive;
+
     public MatchViewModel()
     {
         _countTimer = new DispatcherTimer();
@@ -56,14 +60,14 @@ public partial class MatchViewModel : ObservableObject
 
     public event EventAction GoHomeEvent;
 
-    [ICommand]
+    [RelayCommand]
     private void PassiveLoadAsync()
     {
         if (!_countTimer.IsEnabled)
             _countTimer.Start();
     }
 
-    [ICommand]
+    [RelayCommand]
     private async Task PassiveLoadCheckAsync()
     {
         if (!_countTimer.IsEnabled)
@@ -73,7 +77,7 @@ public partial class MatchViewModel : ObservableObject
         }
     }
 
-    [ICommand]
+    [RelayCommand]
     private void StopPassiveLoadAsync()
     {
         CountTimer?.Stop();
@@ -92,7 +96,7 @@ public partial class MatchViewModel : ObservableObject
         CountdownTime--;
     }
 
-    [ICommand]
+    [RelayCommand]
     private async Task GetMatchInfoAsync()
     {
         Overlay = new LoadingOverlay
@@ -149,19 +153,23 @@ public partial class MatchViewModel : ObservableObject
                 if (newLiveMatch.MatchInfo != null)
                     Match = newLiveMatch.MatchInfo;
 
+                await UpdateMatchInfoAsync().ConfigureAwait(false);
+
                 UpdateStats();
 
+                IsMatchActive = true;
                 Overlay.IsBusy = false;
             }
             else
             {
+                IsMatchActive = false;
                 CountTimer?.Stop();
                 GoHomeEvent?.Invoke();
             }
         }
         catch (Exception)
         {
-            // ignored
+            IsMatchActive = false;
         }
         finally
         {
@@ -169,6 +177,194 @@ public partial class MatchViewModel : ObservableObject
         }
 
         GC.Collect();
+    }
+
+    private async Task UpdateMatchInfoAsync()
+    {
+        try
+        {
+            var matchIdInfo = await LiveMatch.GetMatchResponseAsync().ConfigureAwait(false);
+            if (matchIdInfo != null)
+            {
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    // Map Info
+                    if (matchIdInfo.MapId != null)
+                    {
+                        var mapUrl = matchIdInfo.MapId.ToString();
+                        Match.Map = ValApi.GetMapName(mapUrl);
+                        var mapId = ValApi.GetMapIdFromUrl(mapUrl);
+                        
+                        Constants.Log.Information(">>> [MATCH DATA] MapURL: {Url}", mapUrl);
+                        Constants.Log.Information(">>> [MATCH DATA] MapID: {Id}", mapId);
+                        Constants.Log.Information(">>> [MATCH DATA] MapName: {Name}", Match.Map);
+
+                        if (mapId != null)
+                        {
+                            var mapPath = System.IO.Path.Combine(Constants.LocalAppDataPath, "ValAPI", "mapsimg", mapId + ".png");
+                            if (System.IO.File.Exists(mapPath))
+                            {
+                                Match.MapImage = new Uri(mapPath);
+                                Constants.Log.Information(">>> [MATCH DATA] Map Image FOUND: {Path}", mapPath);
+                            }
+                            else
+                            {
+                                Constants.Log.Warning(">>> [MATCH DATA] Map Image MISSING: {Path}", mapPath);
+                            }
+                        }
+                    }
+
+                    // Queue Info
+                    string queueId = matchIdInfo.QueueId?.ToString();
+                    string provisioningFlow = "Matchmaking"; // Default
+                    try 
+                    {
+                        // Handle dynamic ProvisioningFlow property which might not exist on PreMatchResponse
+                        if (matchIdInfo is LiveMatchResponse liveMatch)
+                        {
+                            provisioningFlow = liveMatch.ProvisioningFlow;
+                        }
+                        // PreMatchResponse doesn't have ProvisioningFlow usually, but we can check if it's dynamic
+                        else 
+                        {
+                            // If it's a dynamic object or has the property via reflection
+                            var prop = matchIdInfo.GetType().GetProperty("ProvisioningFlow");
+                            if (prop != null)
+                            {
+                                provisioningFlow = prop.GetValue(matchIdInfo)?.ToString() ?? "Matchmaking";
+                            }
+                        }
+                    }
+                    catch { }
+
+                    if (queueId == null || queueId == "")
+                    {
+                        if (provisioningFlow == "CustomGame")
+                        {
+                            queueId = "custom";
+                        }
+                    }
+
+                    if (queueId != null)
+                    {
+                        Match.GameMode = ValApi.GetQueueName(queueId);
+                        
+                        // If it's a custom game, try to get more specific game mode info from ModeId
+                        // Custom games might have weird QueueIds (like paths) or "custom" or "null" (handled above)
+                        bool isCustomGame = queueId == "custom" || 
+                                            Match.GameMode == "CUSTOM" || 
+                                            provisioningFlow == "CustomGame" ||
+                                            queueId.StartsWith("/Game/");
+
+                        if (isCustomGame && matchIdInfo.ModeId != null)
+                        {
+                            var modeId = matchIdInfo.ModeId.ToString();
+                            // First try to get info using the full path
+                            var modeInfo = ValApi.GetGamemodeInfo(modeId);
+                            
+                            // If not found, try to extract the game mode name from the path (e.g. BombGameMode -> Bomb)
+                            if (modeInfo == null && modeId.Contains("/"))
+                            {
+                                // Try to find a partial match in the gamemode dictionary
+                                // This is a bit of a hack, but might work if exact path matching fails
+                            }
+                            
+                            if (modeInfo != null)
+                            {
+                                Match.GameMode = modeInfo.Name;
+                                // Try to update image with the specific mode image
+                                var specificModeIconPath = System.IO.Path.Combine(Constants.LocalAppDataPath, "ValAPI", "gamemodeimg", modeInfo.Uuid + ".png");
+                                if (System.IO.File.Exists(specificModeIconPath))
+                                {
+                                    Match.GameModeImage = new Uri(specificModeIconPath);
+                                    Constants.Log.Information(">>> [MATCH DATA] Specific GameMode Image FOUND: {Path}", specificModeIconPath);
+                                }
+                            }
+                            else
+                            {
+                                // Fallback: if we can't find the mode info, at least try to make the name look nicer
+                                if (modeId.Contains("Bomb")) Match.GameMode = "Standard";
+                                else if (modeId.Contains("Deathmatch")) Match.GameMode = "Deathmatch";
+                                else if (modeId.Contains("OneForAll")) Match.GameMode = "Replication";
+                                else if (modeId.Contains("GunGame")) Match.GameMode = "Escalation";
+                                else if (modeId.Contains("SpikeRush")) Match.GameMode = "Spike Rush";
+                                else if (modeId.Contains("Swiftplay")) Match.GameMode = "Swiftplay";
+                                else if (modeId.Contains("HURM")) Match.GameMode = "Team Deathmatch";
+                            }
+                        }
+
+                        // Final check to prevent path-like strings in UI
+                        if (!string.IsNullOrEmpty(Match.GameMode) && (Match.GameMode.StartsWith("/Game/") || Match.GameMode.Contains("/")))
+                        {
+                            if (Match.GameMode.Contains("Swiftplay")) Match.GameMode = "Swiftplay";
+                            else if (Match.GameMode.Contains("Bomb")) Match.GameMode = "Standard";
+                            else if (Match.GameMode.Contains("SpikeRush")) Match.GameMode = "Spike Rush";
+                            else if (Match.GameMode.Contains("Deathmatch")) Match.GameMode = "Deathmatch";
+                            else Match.GameMode = "Custom"; // Fallback to simple "Custom" if we can't parse it
+                        }
+
+                        Constants.Log.Information(">>> [MATCH DATA] QueueID: {Id}", queueId);
+                        Constants.Log.Information(">>> [MATCH DATA] QueueName: {Name}", Match.GameMode);
+
+                        if (Match.GameModeImage == null) // Only set if not already set by specific mode logic
+                        {
+                            var queueIconPath = System.IO.Path.Combine(Constants.LocalAppDataPath, "ValAPI", "gamemodeimg", queueId + ".png");
+                            if (System.IO.File.Exists(queueIconPath))
+                            {
+                                Match.GameModeImage = new Uri(queueIconPath);
+                                Constants.Log.Information(">>> [MATCH DATA] Queue Image FOUND: {Path}", queueIconPath);
+                            }
+                            else
+                            {
+                                Constants.Log.Warning(">>> [MATCH DATA] Queue Image MISSING: {Path}", queueIconPath);
+                            }
+                        }
+                    }
+
+                    // Server Info
+                    string gamePodId = matchIdInfo.GamePodId?.ToString();
+                    Match.ServerName = GetServerName(gamePodId);
+                    Constants.Log.Information(">>> [MATCH DATA] GamePodID: {Id}, ServerName: {Name}", gamePodId, Match.ServerName);
+                    
+                    Constants.Log.Information(">>> [MATCH DATA] Match Info Updated. Mode: {Mode}, Map: {Map}", Match.GameMode, Match.Map);
+                });
+            }
+            else
+            {
+                Constants.Log.Warning(">>> [MATCH DATA] No Match Data received from API");
+            }
+        }
+        catch (Exception ex)
+        {
+            Constants.Log.Error(">>> [MATCH DATA] ERROR in UpdateMatchInfoAsync: {Error}", ex.ToString());
+        }
+    }
+
+    private string GetServerName(string gamePodId)
+    {
+        if (string.IsNullOrEmpty(gamePodId)) return Constants.Region.ToUpper();
+        gamePodId = gamePodId.ToLower();
+        
+        if (gamePodId.Contains("fra")) return "Frankfurt";
+        if (gamePodId.Contains("par")) return "Paris";
+        if (gamePodId.Contains("lon")) return "London";
+        if (gamePodId.Contains("mad")) return "Madrid";
+        if (gamePodId.Contains("waw")) return "Warsaw";
+        if (gamePodId.Contains("ist")) return "Istanbul";
+        if (gamePodId.Contains("bah")) return "Bahrain";
+        if (gamePodId.Contains("sto")) return "Stockholm";
+        if (gamePodId.Contains("tok")) return "Tokyo";
+        if (gamePodId.Contains("mum")) return "Mumbai";
+        if (gamePodId.Contains("syd")) return "Sydney";
+        if (gamePodId.Contains("seo")) return "Seoul";
+        if (gamePodId.Contains("hk")) return "Hong Kong";
+        if (gamePodId.Contains("sg")) return "Singapore";
+        if (gamePodId.Contains("us-east")) return "N. Virginia";
+        if (gamePodId.Contains("us-west")) return "N. California";
+        if (gamePodId.Contains("br")) return "Sao Paulo";
+        if (gamePodId.Contains("latam")) return "Santiago";
+        
+        return Constants.Region.ToUpper();
     }
 
     private async void UpdateStats()

@@ -1,0 +1,186 @@
+{
+    "endpoints": [
+        {
+            "method": "GET",
+            "name": "Agents",
+            "url": "https://valorant-api.com/v1/agents",
+            "description": "",
+            "parameters": [
+                {
+                    "name": "language",
+                    "type": "string",
+                    "description": "Sets the output language",
+                    "default": "en-US",
+                    "required": false
+                },
+                {
+                    "name": "isPlayableCharacter",
+                    "type": "boolean",
+                    "description": "Filters the output array by the property's value",
+                    "default": "none",
+                    "required": false
+                }
+            ],
+            "responses": [
+                {
+                    "status_code": 200,
+                    "description": "Success",
+                    "schema": [
+                        "object {2}",
+                        "status int32",
+                        "data object[] {25}",
+                        "uuid string",
+                        "displayName string (localized)",
+                        "description string (localized)",
+                        "developerName string",
+                        "releaseDate dateTime",
+                        "characterTags string[] (localized)",
+                        "displayIcon string",
+                        "displayIconSmall string",
+                        "bustPortrait string",
+                        "fullPortrait string",
+                        "fullPortraitV2 string",
+                        "killfeedPortrait string",
+                        "minimapPortrait string",
+                        "homeScreenPromoTileImage string",
+                        "background string",
+                        "backgroundGradientColors string[]",
+                        "assetPath string",
+                        "isFullPortraitRightFacing boolean",
+                        "isPlayableCharacter boolean",
+                        "isAvailableForTest boolean",
+                        "isBaseContent boolean",
+                        "role object {5}",
+                        "uuid string",
+                        "displayName string (localized)",
+                        "description string (localized)",
+                        "displayIcon string",
+                        "assetPath string",
+                        "recruitmentData object {7}",
+                        "counterId string",
+                        "milestoneId string",
+                        "milestoneThreshold int32",
+                        "useLevelVpCostOverride boolean",
+                        "levelVpCostOverride int32",
+                        "startDate dateTime",
+                        "endDate dateTime",
+                        "abilities object[] {4}",
+                        "slot string",
+                        "displayName string (localized)",
+                        "description string (localized)",
+                        "displayIcon string",
+                        "voiceLine object {3}",
+                        "minDuration single",
+                        "maxDuration single",
+                        "mediaList object[] {3}",
+                        "id int32",
+                        "wwise string",
+                        "wave string"
+                    ]
+                },
+                {
+                    "status_code": 400,
+                    "description": "Bad Request",
+                    "schema": [
+                        "object {2}",
+                        "status int32",
+                        "error string"
+                    ]
+                }
+            ],
+            "info": "Info: Yes, there are 2 Sovas. Use the isPlayableCharacter=true filter to make sure you don't have a \"duplicate\" Sova."
+        },
+        {
+            "method": "GET",
+            "name": "Agent by Uuid",
+            "url": "https://valorant-api.com/v1/agents/{agentUuid}",
+            "description": "",
+            "parameters": [
+                {
+                    "name": "language",
+                    "type": "string",
+                    "description": "Sets the output language",
+                    "default": "en-US",
+                    "required": false
+                }
+            ],
+            "responses": [
+                {
+                    "status_code": 200,
+                    "description": "Success",
+                    "schema": [
+                        "object {2}",
+                        "status int32",
+                        "data object[] {25}",
+                        "uuid string",
+                        "displayName string (localized)",
+                        "description string (localized)",
+                        "developerName string",
+                        "releaseDate dateTime",
+                        "characterTags string[] (localized)",
+                        "displayIcon string",
+                        "displayIconSmall string",
+                        "bustPortrait string",
+                        "fullPortrait string",
+                        "fullPortraitV2 string",
+                        "killfeedPortrait string",
+                        "minimapPortrait string",
+                        "homeScreenPromoTileImage string",
+                        "background string",
+                        "backgroundGradientColors string[]",
+                        "assetPath string",
+                        "isFullPortraitRightFacing boolean",
+                        "isPlayableCharacter boolean",
+                        "isAvailableForTest boolean",
+                        "isBaseContent boolean",
+                        "role object {5}",
+                        "uuid string",
+                        "displayName string (localized)",
+                        "description string (localized)",
+                        "displayIcon string",
+                        "assetPath string",
+                        "recruitmentData object {7}",
+                        "counterId string",
+                        "milestoneId string",
+                        "milestoneThreshold int32",
+                        "useLevelVpCostOverride boolean",
+                        "levelVpCostOverride int32",
+                        "startDate dateTime",
+                        "endDate dateTime",
+                        "abilities object[] {4}",
+                        "slot string",
+                        "displayName string (localized)",
+                        "description string (localized)",
+                        "displayIcon string",
+                        "voiceLine object {3}",
+                        "minDuration single",
+                        "maxDuration single",
+                        "mediaList object[] {3}",
+                        "id int32",
+                        "wwise string",
+                        "wave string"
+                    ]
+                },
+                {
+                    "status_code": 400,
+                    "description": "Bad Request",
+                    "schema": [
+                        "object {2}",
+                        "status int32",
+                        "error string"
+                    ]
+                },
+                {
+                    "status_code": 404,
+                    "description": "Not Found",
+                    "schema": [
+                        "object {2}",
+                        "status int32",
+                        "error string"
+                    ]
+                }
+            ],
+            "info": "Returns data and assets of the requested agent"
+        }
+    ]
+}

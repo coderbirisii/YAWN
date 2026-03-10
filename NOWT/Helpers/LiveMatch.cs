@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -99,68 +100,109 @@ public class LiveMatch
 
     private static async Task<LiveMatchResponse> GetLiveMatchDetailsAsync()
     {
-        RestClient client =
-            new(
-                $"https://glz-{Constants.Shard}-1.{Constants.Region}.a.pvp.net/core-game/v1/matches/{Matchid}"
+        try
+        {
+            if (string.IsNullOrEmpty(Constants.Shard) || string.IsNullOrEmpty(Constants.Region))
+            {
+                // Not logged in yet or region/shard not set
+                return null;
+            }
+
+            RestClient client =
+                new(
+                    $"https://glz-{Constants.Shard}-1.{Constants.Region}.a.pvp.net"
+                );
+            RestRequest request = new($"/core-game/v1/matches/{Matchid}");
+            request.AddHeader("X-Riot-Entitlements-JWT", Constants.EntitlementToken);
+            request.AddHeader("Authorization", $"Bearer {Constants.AccessToken}");
+            request.AddHeader("X-Riot-ClientPlatform", Constants.Platform);
+            request.AddHeader("X-Riot-ClientVersion", Constants.Version);
+            var response = await client
+                .ExecuteGetAsync<LiveMatchResponse>(request)
+                .ConfigureAwait(false);
+            if (response.IsSuccessful)
+                return response.Data;
+            Constants.Log.Error(
+                "GetLiveMatchDetailsAsync() failed. Status: {Status}, Error: {Error}",
+                response.StatusCode,
+                response.ErrorMessage
             );
-        RestRequest request = new();
-        request.AddHeader("X-Riot-Entitlements-JWT", Constants.EntitlementToken);
-        request.AddHeader("Authorization", $"Bearer {Constants.AccessToken}");
-        request.AddHeader("X-Riot-ClientPlatform", Constants.Platform);
-        request.AddHeader("X-Riot-ClientVersion", Constants.Version);
-        var response = await client
-            .ExecuteGetAsync<LiveMatchResponse>(request)
-            .ConfigureAwait(false);
-        if (response.IsSuccessful)
-            return response.Data;
-        Constants.Log.Error(
-            "GetLiveMatchDetailsAsync() failed. Response: {Response}",
-            response.ErrorException
-        );
+        }
+        catch (Exception ex)
+        {
+            Constants.Log.Error("GetLiveMatchDetailsAsync Exception: {Error}", ex.Message);
+        }
         return null;
     }
 
     private static async Task<PreMatchResponse> GetPreMatchDetailsAsync()
     {
-        RestClient client =
-            new(
-                $"https://glz-{Constants.Shard}-1.{Constants.Region}.a.pvp.net/pregame/v1/matches/{Matchid}"
+        try
+        {
+            if (string.IsNullOrEmpty(Constants.Shard) || string.IsNullOrEmpty(Constants.Region))
+            {
+                // Not logged in yet or region/shard not set
+                return null;
+            }
+
+            RestClient client =
+                new(
+                    $"https://glz-{Constants.Shard}-1.{Constants.Region}.a.pvp.net"
+                );
+            RestRequest request = new($"/pregame/v1/matches/{Matchid}");
+            request.AddHeader("X-Riot-Entitlements-JWT", Constants.EntitlementToken);
+            request.AddHeader("Authorization", $"Bearer {Constants.AccessToken}");
+            request.AddHeader("X-Riot-ClientPlatform", Constants.Platform);
+            request.AddHeader("X-Riot-ClientVersion", Constants.Version);
+            var response = await client
+                .ExecuteGetAsync<PreMatchResponse>(request)
+                .ConfigureAwait(false);
+            if (response.IsSuccessful)
+                return response.Data;
+            Constants.Log.Error(
+                "GetPreMatchDetailsAsync() failed. Status: {Status}, Error: {Error}",
+                response.StatusCode,
+                response.ErrorMessage
             );
-        RestRequest request = new();
-        request.AddHeader("X-Riot-Entitlements-JWT", Constants.EntitlementToken);
-        request.AddHeader("Authorization", $"Bearer {Constants.AccessToken}");
-        request.AddHeader("X-Riot-ClientPlatform", Constants.Platform);
-        request.AddHeader("X-Riot-ClientVersion", Constants.Version);
-        var response = await client
-            .ExecuteGetAsync<PreMatchResponse>(request)
-            .ConfigureAwait(false);
-        if (response.IsSuccessful)
-            return response.Data;
-        Constants.Log.Error(
-            "GetPreMatchDetailsAsync() failed. Response: {Response}",
-            response.ErrorException
-        );
+        }
+        catch (Exception ex)
+        {
+            Constants.Log.Error("GetPreMatchDetailsAsync Exception: {Error}", ex.Message);
+        }
         return null;
     }
 
     private static async Task<PartyResponse> GetPartyDetailsAsync()
     {
-        RestClient client =
-            new(
-                $"https://glz-{Constants.Shard}-1.{Constants.Region}.a.pvp.net/parties/v1/parties/{Partyid}"
+        try
+        {
+            if (string.IsNullOrEmpty(Constants.Shard) || string.IsNullOrEmpty(Constants.Region))
+            {
+                // Not logged in yet or region/shard not set
+                return null;
+            }
+
+            RestClient client =
+                new(
+                    $"https://glz-{Constants.Shard}-1.{Constants.Region}.a.pvp.net/parties/v1/parties/{Partyid}"
+                );
+            RestRequest request = new();
+            request.AddHeader("X-Riot-Entitlements-JWT", Constants.EntitlementToken);
+            request.AddHeader("Authorization", $"Bearer {Constants.AccessToken}");
+            request.AddHeader("X-Riot-ClientPlatform", Constants.Platform);
+            request.AddHeader("X-Riot-ClientVersion", Constants.Version);
+            var response = await client.ExecuteGetAsync<PartyResponse>(request).ConfigureAwait(false);
+            if (response.IsSuccessful)
+                return response.Data;
+            Constants.Log.Error(
+                "GetPartyDetailsAsync() failed. Response: {Response}",
+                response.ErrorException
             );
-        RestRequest request = new();
-        request.AddHeader("X-Riot-Entitlements-JWT", Constants.EntitlementToken);
-        request.AddHeader("Authorization", $"Bearer {Constants.AccessToken}");
-        request.AddHeader("X-Riot-ClientPlatform", Constants.Platform);
-        request.AddHeader("X-Riot-ClientVersion", Constants.Version);
-        var response = await client.ExecuteGetAsync<PartyResponse>(request).ConfigureAwait(false);
-        if (response.IsSuccessful)
-            return response.Data;
-        Constants.Log.Error(
-            "GetPreMatchDetailsAsync() failed. Response: {Response}",
-            response.ErrorException
-        );
+        }
+        catch (Exception ex)
+        {
+            Constants.Log.Error("GetPartyDetailsAsync Exception: {Error}", ex.Message);
+        }
         return null;
     }
 
@@ -177,12 +219,23 @@ public class LiveMatch
             var cardTask = GetCardAsync(riotPlayer.PlayerIdentity.PlayerCardId, index);
             var historyTask = GetPlayerHistoryAsync(riotPlayer.Subject, seasonData);
             var presenceTask = GetPresenceInfoAsync(riotPlayer.Subject, presencesResponse);
+            
+            Task<SkinData> skinTask;
+            if (riotPlayer.Subject == Constants.Ppuuid)
+            {
+                skinTask = GetPartySkinInfoAsync(riotPlayer.Subject, riotPlayer.PlayerIdentity.PlayerCardId);
+            }
+            else
+            {
+                skinTask = GetPreSkinInfoAsync(index, riotPlayer.PlayerIdentity.PlayerCardId);
+            }
 
-            await Task.WhenAll(cardTask, historyTask, presenceTask).ConfigureAwait(false);
+            await Task.WhenAll(cardTask, historyTask, presenceTask, skinTask).ConfigureAwait(false);
 
             player.IdentityData = cardTask.Result;
             player.RankData = historyTask.Result;
             player.PlayerUiData = presenceTask.Result;
+            player.SkinData = skinTask.Result;
             player.IgnData = await GetIgcUsernameAsync(
                     riotPlayer.Subject,
                     riotPlayer.PlayerIdentity.Incognito,
@@ -215,8 +268,17 @@ public class LiveMatch
         {
             var agentTask = GetAgentInfoAsync(riotPlayer.CharacterId);
             var playerTask = GetPlayerHistoryAsync(riotPlayer.Subject, seasonData);
-            var skinTask = GetMatchSkinInfoAsync(index, riotPlayer.PlayerIdentity.PlayerCardId);
             var presenceTask = GetPresenceInfoAsync(riotPlayer.Subject, presencesResponse);
+            
+            Task<SkinData> skinTask;
+            if (riotPlayer.Subject == Constants.Ppuuid)
+            {
+                skinTask = GetPartySkinInfoAsync(riotPlayer.Subject, riotPlayer.PlayerIdentity.PlayerCardId);
+            }
+            else
+            {
+                skinTask = GetMatchSkinInfoAsync(index, riotPlayer.PlayerIdentity.PlayerCardId);
+            }
 
             await Task.WhenAll(agentTask, playerTask, skinTask, presenceTask).ConfigureAwait(false);
 
@@ -294,7 +356,7 @@ public class LiveMatch
         }
     }
 
-    private async Task<dynamic> GetMatchResponse()
+    public static async Task<dynamic> GetMatchResponseAsync()
     {
         if (Stage == "pre")
         {
@@ -310,7 +372,7 @@ public class LiveMatch
         PresencesResponse presencesResponse
     )
     {
-        var matchIdInfo = await GetMatchResponse();
+        var matchIdInfo = await GetMatchResponseAsync();
         updateProgress(10);
 
         if (matchIdInfo == null)
@@ -401,7 +463,21 @@ public class LiveMatch
         var historyTask = GetMatchHistoryAsync(riotPlayer.Subject);
         var playerTask = GetPlayerHistoryAsync(riotPlayer.Subject, seasonData);
 
-        await Task.WhenAll(cardTask, historyTask, playerTask).ConfigureAwait(false);
+        Task<SkinData> skinTask = null;
+        if (riotPlayer.Subject == Constants.Ppuuid)
+        {
+            skinTask = GetPartySkinInfoAsync(riotPlayer.Subject, riotPlayer.PlayerIdentity.PlayerCardId);
+        }
+
+        if (skinTask != null)
+        {
+            await Task.WhenAll(cardTask, historyTask, playerTask, skinTask).ConfigureAwait(false);
+            player.SkinData = skinTask.Result;
+        }
+        else
+        {
+            await Task.WhenAll(cardTask, historyTask, playerTask).ConfigureAwait(false);
+        }
 
         player.IdentityData = cardTask.Result;
         player.MatchHistoryData = historyTask.Result;
@@ -422,6 +498,7 @@ public class LiveMatch
         player.Active = Visibility.Visible;
         return player;
     }
+
 
     private async Task GetPartyPlayers(PartyResponse partyInfo, List<Task<Player>> playerTasks)
     {
@@ -534,15 +611,105 @@ public class LiveMatch
                 true
             )
             .ConfigureAwait(false);
+        
+        Constants.Log.Information("GetMatchSkinInfoAsync: Player={Player}, IsSuccessful={IsSuccessful}", playerno, response.IsSuccessful);
+        
         if (response.IsSuccessful)
         {
             var content = JsonSerializer.Deserialize<MatchLoadoutsResponse>(response.Content);
-            return await GetSkinInfoAsync(content.Loadouts[playerno].Loadout, cardid)
-                .ConfigureAwait(false);
+            var loadout = content.Loadouts[playerno].Loadout;
+            var skinData = await GetSkinInfoAsync(loadout, cardid).ConfigureAwait(false);
+
+            if (loadout.Identity != null)
+            {
+                skinData.PlayerTitle = await BuddyTitleHelper.GetPlayerTitleAsync(loadout.Identity.PlayerTitleId).ConfigureAwait(false);
+                Constants.Log.Information("GetMatchSkinInfoAsync: Player={Player}, Title={Title}", playerno, skinData.PlayerTitle);
+
+                var buddyTasks = new Dictionary<string, Task<ValNameImage>>
+                {
+                    ["29a0cfab-485b-f5d5-779a-b59f85e204a8"] = GetBuddyFromMatchLoadout(loadout.Items, "29a0cfab-485b-f5d5-779a-b59f85e204a8"),
+                    ["42da8ccc-40d5-affc-beec-15aa47b42eda"] = GetBuddyFromMatchLoadout(loadout.Items, "42da8ccc-40d5-affc-beec-15aa47b42eda"),
+                    ["44d4e95c-4157-0037-81b2-17841bf2e8e3"] = GetBuddyFromMatchLoadout(loadout.Items, "44d4e95c-4157-0037-81b2-17841bf2e8e3"),
+                    ["1baa85b4-4c70-1284-64bb-6481dfc3bb4e"] = GetBuddyFromMatchLoadout(loadout.Items, "1baa85b4-4c70-1284-64bb-6481dfc3bb4e"),
+                    ["410b2e0b-4ceb-1321-1727-20858f7f3477"] = GetBuddyFromMatchLoadout(loadout.Items, "410b2e0b-4ceb-1321-1727-20858f7f3477"),
+                    ["e336c6b8-418d-9340-d77f-7a9e4cfe0702"] = GetBuddyFromMatchLoadout(loadout.Items, "e336c6b8-418d-9340-d77f-7a9e4cfe0702"),
+                    ["f7e1b454-4ad4-1063-ec0a-159e56b58941"] = GetBuddyFromMatchLoadout(loadout.Items, "f7e1b454-4ad4-1063-ec0a-159e56b58941"),
+                    ["462080d1-4035-2937-7c09-27aa2a5c27a7"] = GetBuddyFromMatchLoadout(loadout.Items, "462080d1-4035-2937-7c09-27aa2a5c27a7"),
+                    ["910be174-449b-c412-ab22-d0873436b21b"] = GetBuddyFromMatchLoadout(loadout.Items, "910be174-449b-c412-ab22-d0873436b21b"),
+                    ["ec845bf4-4f79-ddda-a3da-0db3774b2794"] = GetBuddyFromMatchLoadout(loadout.Items, "ec845bf4-4f79-ddda-a3da-0db3774b2794"),
+                    ["ae3de142-4d85-2547-dd26-4e90bed35cf7"] = GetBuddyFromMatchLoadout(loadout.Items, "ae3de142-4d85-2547-dd26-4e90bed35cf7"),
+                    ["4ade7faa-4cf1-8376-95ef-39884480959b"] = GetBuddyFromMatchLoadout(loadout.Items, "4ade7faa-4cf1-8376-95ef-39884480959b"),
+                    ["ee8e8d15-496b-07ac-e5f6-8fae5d4c7b1a"] = GetBuddyFromMatchLoadout(loadout.Items, "ee8e8d15-496b-07ac-e5f6-8fae5d4c7b1a"),
+                    ["9c82e19d-4575-0200-1a81-3eacf00cf872"] = GetBuddyFromMatchLoadout(loadout.Items, "9c82e19d-4575-0200-1a81-3eacf00cf872"),
+                    ["c4883e50-4494-202c-3ec3-6b8a9284f00b"] = GetBuddyFromMatchLoadout(loadout.Items, "c4883e50-4494-202c-3ec3-6b8a9284f00b"),
+                    ["5f0aaf7a-4289-3998-d5ff-eb9a5cf7ef5c"] = GetBuddyFromMatchLoadout(loadout.Items, "5f0aaf7a-4289-3998-d5ff-eb9a5cf7ef5c"),
+                    ["a03b24d3-4319-996d-0f8c-94bbfba1dfc7"] = GetBuddyFromMatchLoadout(loadout.Items, "a03b24d3-4319-996d-0f8c-94bbfba1dfc7"),
+                    ["55d8a0f4-4274-ca67-fe2c-06ab45efdf58"] = GetBuddyFromMatchLoadout(loadout.Items, "55d8a0f4-4274-ca67-fe2c-06ab45efdf58"),
+                    ["63e6c2b6-4a8e-869c-3d4c-e38355226584"] = GetBuddyFromMatchLoadout(loadout.Items, "63e6c2b6-4a8e-869c-3d4c-e38355226584"),
+                    ["2f59173c-4bed-b6c3-2191-dea9b58be9c7"] = GetBuddyFromMatchLoadout(loadout.Items, "2f59173c-4bed-b6c3-2191-dea9b58be9c7")
+                };
+
+                await Task.WhenAll(buddyTasks.Values).ConfigureAwait(false);
+
+                skinData.ClassicBuddyImage = buddyTasks["29a0cfab-485b-f5d5-779a-b59f85e204a8"].Result.Image;
+                skinData.ClassicBuddyName = buddyTasks["29a0cfab-485b-f5d5-779a-b59f85e204a8"].Result.Name;
+                skinData.ShortyBuddyImage = buddyTasks["42da8ccc-40d5-affc-beec-15aa47b42eda"].Result.Image;
+                skinData.ShortyBuddyName = buddyTasks["42da8ccc-40d5-affc-beec-15aa47b42eda"].Result.Name;
+                skinData.FrenzyBuddyImage = buddyTasks["44d4e95c-4157-0037-81b2-17841bf2e8e3"].Result.Image;
+                skinData.FrenzyBuddyName = buddyTasks["44d4e95c-4157-0037-81b2-17841bf2e8e3"].Result.Name;
+                skinData.GhostBuddyImage = buddyTasks["1baa85b4-4c70-1284-64bb-6481dfc3bb4e"].Result.Image;
+                skinData.GhostBuddyName = buddyTasks["1baa85b4-4c70-1284-64bb-6481dfc3bb4e"].Result.Name;
+                skinData.BanditBuddyImage = buddyTasks["410b2e0b-4ceb-1321-1727-20858f7f3477"].Result.Image;
+                skinData.BanditBuddyName = buddyTasks["410b2e0b-4ceb-1321-1727-20858f7f3477"].Result.Name;
+                skinData.SheriffBuddyImage = buddyTasks["e336c6b8-418d-9340-d77f-7a9e4cfe0702"].Result.Image;
+                skinData.SheriffBuddyName = buddyTasks["e336c6b8-418d-9340-d77f-7a9e4cfe0702"].Result.Name;
+                skinData.StingerBuddyImage = buddyTasks["f7e1b454-4ad4-1063-ec0a-159e56b58941"].Result.Image;
+                skinData.StingerBuddyName = buddyTasks["f7e1b454-4ad4-1063-ec0a-159e56b58941"].Result.Name;
+                skinData.SpectreBuddyImage = buddyTasks["462080d1-4035-2937-7c09-27aa2a5c27a7"].Result.Image;
+                skinData.SpectreBuddyName = buddyTasks["462080d1-4035-2937-7c09-27aa2a5c27a7"].Result.Name;
+                skinData.BuckyBuddyImage = buddyTasks["910be174-449b-c412-ab22-d0873436b21b"].Result.Image;
+                skinData.BuckyBuddyName = buddyTasks["910be174-449b-c412-ab22-d0873436b21b"].Result.Name;
+                skinData.JudgeBuddyImage = buddyTasks["ec845bf4-4f79-ddda-a3da-0db3774b2794"].Result.Image;
+                skinData.JudgeBuddyName = buddyTasks["ec845bf4-4f79-ddda-a3da-0db3774b2794"].Result.Name;
+                skinData.BulldogBuddyImage = buddyTasks["ae3de142-4d85-2547-dd26-4e90bed35cf7"].Result.Image;
+                skinData.BulldogBuddyName = buddyTasks["ae3de142-4d85-2547-dd26-4e90bed35cf7"].Result.Name;
+                skinData.GuardianBuddyImage = buddyTasks["4ade7faa-4cf1-8376-95ef-39884480959b"].Result.Image;
+                skinData.GuardianBuddyName = buddyTasks["4ade7faa-4cf1-8376-95ef-39884480959b"].Result.Name;
+                skinData.PhantomBuddyImage = buddyTasks["ee8e8d15-496b-07ac-e5f6-8fae5d4c7b1a"].Result.Image;
+                skinData.PhantomBuddyName = buddyTasks["ee8e8d15-496b-07ac-e5f6-8fae5d4c7b1a"].Result.Name;
+                skinData.VandalBuddyImage = buddyTasks["9c82e19d-4575-0200-1a81-3eacf00cf872"].Result.Image;
+                skinData.VandalBuddyName = buddyTasks["9c82e19d-4575-0200-1a81-3eacf00cf872"].Result.Name;
+                skinData.MarshalBuddyImage = buddyTasks["c4883e50-4494-202c-3ec3-6b8a9284f00b"].Result.Image;
+                skinData.MarshalBuddyName = buddyTasks["c4883e50-4494-202c-3ec3-6b8a9284f00b"].Result.Name;
+                skinData.OutlawBuddyImage = buddyTasks["5f0aaf7a-4289-3998-d5ff-eb9a5cf7ef5c"].Result.Image;
+                skinData.OutlawBuddyName = buddyTasks["5f0aaf7a-4289-3998-d5ff-eb9a5cf7ef5c"].Result.Name;
+                skinData.OperatorBuddyImage = buddyTasks["a03b24d3-4319-996d-0f8c-94bbfba1dfc7"].Result.Image;
+                skinData.OperatorBuddyName = buddyTasks["a03b24d3-4319-996d-0f8c-94bbfba1dfc7"].Result.Name;
+                skinData.AresBuddyImage = buddyTasks["55d8a0f4-4274-ca67-fe2c-06ab45efdf58"].Result.Image;
+                skinData.AresBuddyName = buddyTasks["55d8a0f4-4274-ca67-fe2c-06ab45efdf58"].Result.Name;
+                skinData.OdinBuddyImage = buddyTasks["63e6c2b6-4a8e-869c-3d4c-e38355226584"].Result.Image;
+                skinData.OdinBuddyName = buddyTasks["63e6c2b6-4a8e-869c-3d4c-e38355226584"].Result.Name;
+                skinData.MeleeBuddyImage = buddyTasks["2f59173c-4bed-b6c3-2191-dea9b58be9c7"].Result.Image;
+                skinData.MeleeBuddyName = buddyTasks["2f59173c-4bed-b6c3-2191-dea9b58be9c7"].Result.Name;
+            }
+
+            return skinData;
         }
 
         Constants.Log.Error("GetMatchSkinInfoAsync Failed: {e}", response.ErrorException);
         return new SkinData();
+    }
+
+    private static async Task<ValNameImage> GetBuddyFromMatchLoadout(Dictionary<string, ItemValue> items, string weaponId)
+    {
+        if (items.TryGetValue(weaponId, out var weapon))
+        {
+            if (weapon.Sockets != null && weapon.Sockets.TryGetValue("bcef87d6-209b-46c6-8b19-fbe40bd95abc", out var charmSocket))
+            {
+                return await BuddyTitleHelper.GetBuddyInfoAsync(charmSocket.Item.Id).ConfigureAwait(false);
+            }
+        }
+        return new ValNameImage();
     }
 
     private static async Task<SkinData> GetPreSkinInfoAsync(sbyte playerno, Guid cardid)
@@ -553,22 +720,287 @@ public class LiveMatch
                 true
             )
             .ConfigureAwait(false);
+        
+        Constants.Log.Information("GetPreSkinInfoAsync: Player={Player}, IsSuccessful={IsSuccessful}", playerno, response.IsSuccessful);
+        
         if (response.IsSuccessful)
             try
             {
-                var content = JsonSerializer.Deserialize<PreMatchLoadoutsResponse>(
+                var content = JsonSerializer.Deserialize<PreMatchLoadoutsExtendedResponse>(
                     response.Content
                 );
-                return await GetSkinInfoAsync(content.Loadouts[playerno], cardid);
+
+                if (content?.Loadouts == null || playerno >= content.Loadouts.Length)
+                {
+                    Constants.Log.Warning("GetPreSkinInfoAsync: Invalid loadouts. Player={Player}, Count={Count}", playerno, content?.Loadouts?.Length ?? 0);
+                    return new SkinData();
+                }
+
+                var playerLoadout = content.Loadouts[playerno];
+                if (playerLoadout?.Loadout == null)
+                {
+                    Constants.Log.Warning("GetPreSkinInfoAsync: Loadout is null. Player={Player}", playerno);
+                    return new SkinData();
+                }
+
+                var loadout = new LoadoutLoadout
+                {
+                    Sprays = new Sprays
+                    {
+                        SpraySelections = playerLoadout.Loadout.Sprays.SpraySelections.Select(s => new SpraySelection
+                        {
+                            AssetId = s.SprayId,
+                            TypeId = s.SocketId
+                        }).ToArray()
+                    },
+                    Items = playerLoadout.Loadout.Items.ToDictionary(
+                        kvp => kvp.Key,
+                        kvp => new ItemValue
+                        {
+                            Id = kvp.Value.Id,
+                            TypeId = kvp.Value.TypeId,
+                            Sockets = kvp.Value.Sockets.ToDictionary(
+                                s => s.Key,
+                                s => new Socket
+                                {
+                                    Id = s.Value.Id,
+                                    Item = new SocketItem
+                                    {
+                                        Id = s.Value.Item.Id,
+                                        TypeId = s.Value.Item.TypeId
+                                    }
+                                }
+                            )
+                        }
+                    )
+                };
+
+                var skinData = await GetSkinInfoAsync(loadout, cardid).ConfigureAwait(false);
+
+                if (playerLoadout.Loadout.Identity != null)
+                {
+                    skinData.PlayerTitle = await BuddyTitleHelper.GetPlayerTitleAsync(playerLoadout.Loadout.Identity.PlayerTitleId).ConfigureAwait(false);
+
+                    var buddyTasks = new Dictionary<string, Task<ValNameImage>>
+                {
+                    ["29a0cfab-485b-f5d5-779a-b59f85e204a8"] = GetBuddyFromLoadout(playerLoadout.Loadout.Items, "29a0cfab-485b-f5d5-779a-b59f85e204a8"),
+                    ["42da8ccc-40d5-affc-beec-15aa47b42eda"] = GetBuddyFromLoadout(playerLoadout.Loadout.Items, "42da8ccc-40d5-affc-beec-15aa47b42eda"),
+                    ["44d4e95c-4157-0037-81b2-17841bf2e8e3"] = GetBuddyFromLoadout(playerLoadout.Loadout.Items, "44d4e95c-4157-0037-81b2-17841bf2e8e3"),
+                    ["1baa85b4-4c70-1284-64bb-6481dfc3bb4e"] = GetBuddyFromLoadout(playerLoadout.Loadout.Items, "1baa85b4-4c70-1284-64bb-6481dfc3bb4e"),
+                    ["410b2e0b-4ceb-1321-1727-20858f7f3477"] = GetBuddyFromLoadout(playerLoadout.Loadout.Items, "410b2e0b-4ceb-1321-1727-20858f7f3477"),
+                    ["e336c6b8-418d-9340-d77f-7a9e4cfe0702"] = GetBuddyFromLoadout(playerLoadout.Loadout.Items, "e336c6b8-418d-9340-d77f-7a9e4cfe0702"),
+                    ["f7e1b454-4ad4-1063-ec0a-159e56b58941"] = GetBuddyFromLoadout(playerLoadout.Loadout.Items, "f7e1b454-4ad4-1063-ec0a-159e56b58941"),
+                    ["462080d1-4035-2937-7c09-27aa2a5c27a7"] = GetBuddyFromLoadout(playerLoadout.Loadout.Items, "462080d1-4035-2937-7c09-27aa2a5c27a7"),
+                    ["910be174-449b-c412-ab22-d0873436b21b"] = GetBuddyFromLoadout(playerLoadout.Loadout.Items, "910be174-449b-c412-ab22-d0873436b21b"),
+                    ["ec845bf4-4f79-ddda-a3da-0db3774b2794"] = GetBuddyFromLoadout(playerLoadout.Loadout.Items, "ec845bf4-4f79-ddda-a3da-0db3774b2794"),
+                    ["ae3de142-4d85-2547-dd26-4e90bed35cf7"] = GetBuddyFromLoadout(playerLoadout.Loadout.Items, "ae3de142-4d85-2547-dd26-4e90bed35cf7"),
+                    ["4ade7faa-4cf1-8376-95ef-39884480959b"] = GetBuddyFromLoadout(playerLoadout.Loadout.Items, "4ade7faa-4cf1-8376-95ef-39884480959b"),
+                    ["ee8e8d15-496b-07ac-e5f6-8fae5d4c7b1a"] = GetBuddyFromLoadout(playerLoadout.Loadout.Items, "ee8e8d15-496b-07ac-e5f6-8fae5d4c7b1a"),
+                    ["9c82e19d-4575-0200-1a81-3eacf00cf872"] = GetBuddyFromLoadout(playerLoadout.Loadout.Items, "9c82e19d-4575-0200-1a81-3eacf00cf872"),
+                    ["c4883e50-4494-202c-3ec3-6b8a9284f00b"] = GetBuddyFromLoadout(playerLoadout.Loadout.Items, "c4883e50-4494-202c-3ec3-6b8a9284f00b"),
+                    ["5f0aaf7a-4289-3998-d5ff-eb9a5cf7ef5c"] = GetBuddyFromLoadout(playerLoadout.Loadout.Items, "5f0aaf7a-4289-3998-d5ff-eb9a5cf7ef5c"),
+                    ["a03b24d3-4319-996d-0f8c-94bbfba1dfc7"] = GetBuddyFromLoadout(playerLoadout.Loadout.Items, "a03b24d3-4319-996d-0f8c-94bbfba1dfc7"),
+                    ["55d8a0f4-4274-ca67-fe2c-06ab45efdf58"] = GetBuddyFromLoadout(playerLoadout.Loadout.Items, "55d8a0f4-4274-ca67-fe2c-06ab45efdf58"),
+                    ["63e6c2b6-4a8e-869c-3d4c-e38355226584"] = GetBuddyFromLoadout(playerLoadout.Loadout.Items, "63e6c2b6-4a8e-869c-3d4c-e38355226584"),
+                    ["2f59173c-4bed-b6c3-2191-dea9b58be9c7"] = GetBuddyFromLoadout(playerLoadout.Loadout.Items, "2f59173c-4bed-b6c3-2191-dea9b58be9c7")
+                };
+
+                await Task.WhenAll(buddyTasks.Values).ConfigureAwait(false);
+
+                skinData.ClassicBuddyImage = buddyTasks["29a0cfab-485b-f5d5-779a-b59f85e204a8"].Result.Image;
+                skinData.ClassicBuddyName = buddyTasks["29a0cfab-485b-f5d5-779a-b59f85e204a8"].Result.Name;
+                skinData.ShortyBuddyImage = buddyTasks["42da8ccc-40d5-affc-beec-15aa47b42eda"].Result.Image;
+                skinData.ShortyBuddyName = buddyTasks["42da8ccc-40d5-affc-beec-15aa47b42eda"].Result.Name;
+                skinData.FrenzyBuddyImage = buddyTasks["44d4e95c-4157-0037-81b2-17841bf2e8e3"].Result.Image;
+                skinData.FrenzyBuddyName = buddyTasks["44d4e95c-4157-0037-81b2-17841bf2e8e3"].Result.Name;
+                skinData.GhostBuddyImage = buddyTasks["1baa85b4-4c70-1284-64bb-6481dfc3bb4e"].Result.Image;
+                skinData.GhostBuddyName = buddyTasks["1baa85b4-4c70-1284-64bb-6481dfc3bb4e"].Result.Name;
+                skinData.BanditBuddyImage = buddyTasks["410b2e0b-4ceb-1321-1727-20858f7f3477"].Result.Image;
+                skinData.BanditBuddyName = buddyTasks["410b2e0b-4ceb-1321-1727-20858f7f3477"].Result.Name;
+                skinData.SheriffBuddyImage = buddyTasks["e336c6b8-418d-9340-d77f-7a9e4cfe0702"].Result.Image;
+                skinData.SheriffBuddyName = buddyTasks["e336c6b8-418d-9340-d77f-7a9e4cfe0702"].Result.Name;
+                skinData.StingerBuddyImage = buddyTasks["f7e1b454-4ad4-1063-ec0a-159e56b58941"].Result.Image;
+                skinData.StingerBuddyName = buddyTasks["f7e1b454-4ad4-1063-ec0a-159e56b58941"].Result.Name;
+                skinData.SpectreBuddyImage = buddyTasks["462080d1-4035-2937-7c09-27aa2a5c27a7"].Result.Image;
+                skinData.SpectreBuddyName = buddyTasks["462080d1-4035-2937-7c09-27aa2a5c27a7"].Result.Name;
+                skinData.BuckyBuddyImage = buddyTasks["910be174-449b-c412-ab22-d0873436b21b"].Result.Image;
+                skinData.BuckyBuddyName = buddyTasks["910be174-449b-c412-ab22-d0873436b21b"].Result.Name;
+                skinData.JudgeBuddyImage = buddyTasks["ec845bf4-4f79-ddda-a3da-0db3774b2794"].Result.Image;
+                skinData.JudgeBuddyName = buddyTasks["ec845bf4-4f79-ddda-a3da-0db3774b2794"].Result.Name;
+                skinData.BulldogBuddyImage = buddyTasks["ae3de142-4d85-2547-dd26-4e90bed35cf7"].Result.Image;
+                skinData.BulldogBuddyName = buddyTasks["ae3de142-4d85-2547-dd26-4e90bed35cf7"].Result.Name;
+                skinData.GuardianBuddyImage = buddyTasks["4ade7faa-4cf1-8376-95ef-39884480959b"].Result.Image;
+                skinData.GuardianBuddyName = buddyTasks["4ade7faa-4cf1-8376-95ef-39884480959b"].Result.Name;
+                skinData.PhantomBuddyImage = buddyTasks["ee8e8d15-496b-07ac-e5f6-8fae5d4c7b1a"].Result.Image;
+                skinData.PhantomBuddyName = buddyTasks["ee8e8d15-496b-07ac-e5f6-8fae5d4c7b1a"].Result.Name;
+                skinData.VandalBuddyImage = buddyTasks["9c82e19d-4575-0200-1a81-3eacf00cf872"].Result.Image;
+                skinData.VandalBuddyName = buddyTasks["9c82e19d-4575-0200-1a81-3eacf00cf872"].Result.Name;
+                skinData.MarshalBuddyImage = buddyTasks["c4883e50-4494-202c-3ec3-6b8a9284f00b"].Result.Image;
+                skinData.MarshalBuddyName = buddyTasks["c4883e50-4494-202c-3ec3-6b8a9284f00b"].Result.Name;
+                skinData.OutlawBuddyImage = buddyTasks["5f0aaf7a-4289-3998-d5ff-eb9a5cf7ef5c"].Result.Image;
+                skinData.OutlawBuddyName = buddyTasks["5f0aaf7a-4289-3998-d5ff-eb9a5cf7ef5c"].Result.Name;
+                skinData.OperatorBuddyImage = buddyTasks["a03b24d3-4319-996d-0f8c-94bbfba1dfc7"].Result.Image;
+                skinData.OperatorBuddyName = buddyTasks["a03b24d3-4319-996d-0f8c-94bbfba1dfc7"].Result.Name;
+                skinData.AresBuddyImage = buddyTasks["55d8a0f4-4274-ca67-fe2c-06ab45efdf58"].Result.Image;
+                skinData.AresBuddyName = buddyTasks["55d8a0f4-4274-ca67-fe2c-06ab45efdf58"].Result.Name;
+                skinData.OdinBuddyImage = buddyTasks["63e6c2b6-4a8e-869c-3d4c-e38355226584"].Result.Image;
+                skinData.OdinBuddyName = buddyTasks["63e6c2b6-4a8e-869c-3d4c-e38355226584"].Result.Name;
+                skinData.MeleeBuddyImage = buddyTasks["2f59173c-4bed-b6c3-2191-dea9b58be9c7"].Result.Image;
+                skinData.MeleeBuddyName = buddyTasks["2f59173c-4bed-b6c3-2191-dea9b58be9c7"].Result.Name;
+                }
+
+                Constants.Log.Information("GetPreSkinInfoAsync: Player={Player} completed", playerno);
+                return skinData;
             }
-            catch
+            catch (Exception ex)
             {
-                // ignored
+                Constants.Log.Error("GetPreSkinInfoAsync Failed: Player={Player}, Exception={Exception}", playerno, ex);
+                return new SkinData();
             }
 
-        Constants.Log.Error("GetPreSkinInfoAsync Failed: {e}", response.ErrorException);
+        Constants.Log.Error("GetPreSkinInfoAsync Failed: Player={Player}, StatusCode={StatusCode}", playerno, response.StatusCode);
         return new SkinData();
     }
+
+    private static async Task<ValNameImage> GetBuddyFromLoadout(Dictionary<string, PreMatchItemValue> items, string weaponId)
+    {
+        if (items.TryGetValue(weaponId, out var weapon))
+        {
+            if (weapon.Sockets != null && weapon.Sockets.TryGetValue("bcef87d6-209b-46c6-8b19-fbe40bd95abc", out var charmSocket))
+            {
+                return await BuddyTitleHelper.GetBuddyInfoAsync(charmSocket.Item.Id).ConfigureAwait(false);
+            }
+        }
+        return new ValNameImage();
+    }
+
+
+    private static async Task<SkinData> GetPartySkinInfoAsync(Guid puuid, Guid cardid)
+    {
+        var response = await DoCachedRequestAsync(
+                Method.Get,
+                $"https://pd.{Constants.Region}.a.pvp.net/personalization/v2/players/{puuid}/playerloadout",
+                true
+            )
+            .ConfigureAwait(false);
+        
+        Constants.Log.Information("GetPartySkinInfoAsync Response: IsSuccessful={IsSuccessful}, StatusCode={StatusCode}", 
+            response.IsSuccessful, response.StatusCode);
+        
+        if (response.IsSuccessful)
+        {
+            var playerLoadout = JsonSerializer.Deserialize<PlayerLoadoutResponse>(response.Content);
+            
+            var loadout = new LoadoutLoadout
+            {
+                Sprays = new Sprays
+                {
+                    SpraySelections = playerLoadout.Sprays.Select(s => new SpraySelection
+                    {
+                        AssetId = s.SprayId,
+                        TypeId = s.EquipSlotId
+                    }).ToArray()
+                },
+                Items = playerLoadout.Guns.ToDictionary(
+                    g => g.Id.ToString(),
+                    g => new ItemValue
+                    {
+                        Id = g.Id,
+                        TypeId = g.Id,
+                        Sockets = new Dictionary<string, Socket>
+                        {
+                            ["3ad1b2b2-acdb-4524-852f-954a76ddae0a"] = new Socket
+                            {
+                                Id = Guid.Parse("3ad1b2b2-acdb-4524-852f-954a76ddae0a"),
+                                Item = new SocketItem
+                                {
+                                    Id = g.ChromaId,
+                                    TypeId = g.SkinId
+                                }
+                            }
+                        }
+                    }
+                )
+            };
+            
+            var skinData = await GetSkinInfoAsync(loadout, cardid).ConfigureAwait(false);
+            
+            skinData.PlayerTitle = await BuddyTitleHelper.GetPlayerTitleAsync(playerLoadout.Identity.PlayerTitleId).ConfigureAwait(false);
+            
+            var buddyTasks = new Dictionary<string, Task<ValNameImage>>
+            {
+                ["29a0cfab-485b-f5d5-779a-b59f85e204a8"] = BuddyTitleHelper.GetBuddyInfoAsync(playerLoadout.Guns.FirstOrDefault(g => g.Id.ToString() == "29a0cfab-485b-f5d5-779a-b59f85e204a8")?.CharmLevelId),
+                ["42da8ccc-40d5-affc-beec-15aa47b42eda"] = BuddyTitleHelper.GetBuddyInfoAsync(playerLoadout.Guns.FirstOrDefault(g => g.Id.ToString() == "42da8ccc-40d5-affc-beec-15aa47b42eda")?.CharmLevelId),
+                ["44d4e95c-4157-0037-81b2-17841bf2e8e3"] = BuddyTitleHelper.GetBuddyInfoAsync(playerLoadout.Guns.FirstOrDefault(g => g.Id.ToString() == "44d4e95c-4157-0037-81b2-17841bf2e8e3")?.CharmLevelId),
+                ["1baa85b4-4c70-1284-64bb-6481dfc3bb4e"] = BuddyTitleHelper.GetBuddyInfoAsync(playerLoadout.Guns.FirstOrDefault(g => g.Id.ToString() == "1baa85b4-4c70-1284-64bb-6481dfc3bb4e")?.CharmLevelId),
+                ["410b2e0b-4ceb-1321-1727-20858f7f3477"] = BuddyTitleHelper.GetBuddyInfoAsync(playerLoadout.Guns.FirstOrDefault(g => g.Id.ToString() == "410b2e0b-4ceb-1321-1727-20858f7f3477")?.CharmLevelId),
+                ["e336c6b8-418d-9340-d77f-7a9e4cfe0702"] = BuddyTitleHelper.GetBuddyInfoAsync(playerLoadout.Guns.FirstOrDefault(g => g.Id.ToString() == "e336c6b8-418d-9340-d77f-7a9e4cfe0702")?.CharmLevelId),
+                ["f7e1b454-4ad4-1063-ec0a-159e56b58941"] = BuddyTitleHelper.GetBuddyInfoAsync(playerLoadout.Guns.FirstOrDefault(g => g.Id.ToString() == "f7e1b454-4ad4-1063-ec0a-159e56b58941")?.CharmLevelId),
+                ["462080d1-4035-2937-7c09-27aa2a5c27a7"] = BuddyTitleHelper.GetBuddyInfoAsync(playerLoadout.Guns.FirstOrDefault(g => g.Id.ToString() == "462080d1-4035-2937-7c09-27aa2a5c27a7")?.CharmLevelId),
+                ["910be174-449b-c412-ab22-d0873436b21b"] = BuddyTitleHelper.GetBuddyInfoAsync(playerLoadout.Guns.FirstOrDefault(g => g.Id.ToString() == "910be174-449b-c412-ab22-d0873436b21b")?.CharmLevelId),
+                ["ec845bf4-4f79-ddda-a3da-0db3774b2794"] = BuddyTitleHelper.GetBuddyInfoAsync(playerLoadout.Guns.FirstOrDefault(g => g.Id.ToString() == "ec845bf4-4f79-ddda-a3da-0db3774b2794")?.CharmLevelId),
+                ["ae3de142-4d85-2547-dd26-4e90bed35cf7"] = BuddyTitleHelper.GetBuddyInfoAsync(playerLoadout.Guns.FirstOrDefault(g => g.Id.ToString() == "ae3de142-4d85-2547-dd26-4e90bed35cf7")?.CharmLevelId),
+                ["4ade7faa-4cf1-8376-95ef-39884480959b"] = BuddyTitleHelper.GetBuddyInfoAsync(playerLoadout.Guns.FirstOrDefault(g => g.Id.ToString() == "4ade7faa-4cf1-8376-95ef-39884480959b")?.CharmLevelId),
+                ["ee8e8d15-496b-07ac-e5f6-8fae5d4c7b1a"] = BuddyTitleHelper.GetBuddyInfoAsync(playerLoadout.Guns.FirstOrDefault(g => g.Id.ToString() == "ee8e8d15-496b-07ac-e5f6-8fae5d4c7b1a")?.CharmLevelId),
+                ["9c82e19d-4575-0200-1a81-3eacf00cf872"] = BuddyTitleHelper.GetBuddyInfoAsync(playerLoadout.Guns.FirstOrDefault(g => g.Id.ToString() == "9c82e19d-4575-0200-1a81-3eacf00cf872")?.CharmLevelId),
+                ["c4883e50-4494-202c-3ec3-6b8a9284f00b"] = BuddyTitleHelper.GetBuddyInfoAsync(playerLoadout.Guns.FirstOrDefault(g => g.Id.ToString() == "c4883e50-4494-202c-3ec3-6b8a9284f00b")?.CharmLevelId),
+                ["5f0aaf7a-4289-3998-d5ff-eb9a5cf7ef5c"] = BuddyTitleHelper.GetBuddyInfoAsync(playerLoadout.Guns.FirstOrDefault(g => g.Id.ToString() == "5f0aaf7a-4289-3998-d5ff-eb9a5cf7ef5c")?.CharmLevelId),
+                ["a03b24d3-4319-996d-0f8c-94bbfba1dfc7"] = BuddyTitleHelper.GetBuddyInfoAsync(playerLoadout.Guns.FirstOrDefault(g => g.Id.ToString() == "a03b24d3-4319-996d-0f8c-94bbfba1dfc7")?.CharmLevelId),
+                ["55d8a0f4-4274-ca67-fe2c-06ab45efdf58"] = BuddyTitleHelper.GetBuddyInfoAsync(playerLoadout.Guns.FirstOrDefault(g => g.Id.ToString() == "55d8a0f4-4274-ca67-fe2c-06ab45efdf58")?.CharmLevelId),
+                ["63e6c2b6-4a8e-869c-3d4c-e38355226584"] = BuddyTitleHelper.GetBuddyInfoAsync(playerLoadout.Guns.FirstOrDefault(g => g.Id.ToString() == "63e6c2b6-4a8e-869c-3d4c-e38355226584")?.CharmLevelId),
+                ["2f59173c-4bed-b6c3-2191-dea9b58be9c7"] = BuddyTitleHelper.GetBuddyInfoAsync(playerLoadout.Guns.FirstOrDefault(g => g.Id.ToString() == "2f59173c-4bed-b6c3-2191-dea9b58be9c7")?.CharmLevelId)
+            };
+            
+            await Task.WhenAll(buddyTasks.Values).ConfigureAwait(false);
+            
+            skinData.ClassicBuddyImage = buddyTasks["29a0cfab-485b-f5d5-779a-b59f85e204a8"].Result.Image;
+            skinData.ClassicBuddyName = buddyTasks["29a0cfab-485b-f5d5-779a-b59f85e204a8"].Result.Name;
+            skinData.ShortyBuddyImage = buddyTasks["42da8ccc-40d5-affc-beec-15aa47b42eda"].Result.Image;
+            skinData.ShortyBuddyName = buddyTasks["42da8ccc-40d5-affc-beec-15aa47b42eda"].Result.Name;
+            skinData.FrenzyBuddyImage = buddyTasks["44d4e95c-4157-0037-81b2-17841bf2e8e3"].Result.Image;
+            skinData.FrenzyBuddyName = buddyTasks["44d4e95c-4157-0037-81b2-17841bf2e8e3"].Result.Name;
+            skinData.GhostBuddyImage = buddyTasks["1baa85b4-4c70-1284-64bb-6481dfc3bb4e"].Result.Image;
+            skinData.GhostBuddyName = buddyTasks["1baa85b4-4c70-1284-64bb-6481dfc3bb4e"].Result.Name;
+            skinData.BanditBuddyImage = buddyTasks["410b2e0b-4ceb-1321-1727-20858f7f3477"].Result.Image;
+            skinData.BanditBuddyName = buddyTasks["410b2e0b-4ceb-1321-1727-20858f7f3477"].Result.Name;
+            skinData.SheriffBuddyImage = buddyTasks["e336c6b8-418d-9340-d77f-7a9e4cfe0702"].Result.Image;
+            skinData.SheriffBuddyName = buddyTasks["e336c6b8-418d-9340-d77f-7a9e4cfe0702"].Result.Name;
+            skinData.StingerBuddyImage = buddyTasks["f7e1b454-4ad4-1063-ec0a-159e56b58941"].Result.Image;
+            skinData.StingerBuddyName = buddyTasks["f7e1b454-4ad4-1063-ec0a-159e56b58941"].Result.Name;
+            skinData.SpectreBuddyImage = buddyTasks["462080d1-4035-2937-7c09-27aa2a5c27a7"].Result.Image;
+            skinData.SpectreBuddyName = buddyTasks["462080d1-4035-2937-7c09-27aa2a5c27a7"].Result.Name;
+            skinData.BuckyBuddyImage = buddyTasks["910be174-449b-c412-ab22-d0873436b21b"].Result.Image;
+            skinData.BuckyBuddyName = buddyTasks["910be174-449b-c412-ab22-d0873436b21b"].Result.Name;
+            skinData.JudgeBuddyImage = buddyTasks["ec845bf4-4f79-ddda-a3da-0db3774b2794"].Result.Image;
+            skinData.JudgeBuddyName = buddyTasks["ec845bf4-4f79-ddda-a3da-0db3774b2794"].Result.Name;
+            skinData.BulldogBuddyImage = buddyTasks["ae3de142-4d85-2547-dd26-4e90bed35cf7"].Result.Image;
+            skinData.BulldogBuddyName = buddyTasks["ae3de142-4d85-2547-dd26-4e90bed35cf7"].Result.Name;
+            skinData.GuardianBuddyImage = buddyTasks["4ade7faa-4cf1-8376-95ef-39884480959b"].Result.Image;
+            skinData.GuardianBuddyName = buddyTasks["4ade7faa-4cf1-8376-95ef-39884480959b"].Result.Name;
+            skinData.PhantomBuddyImage = buddyTasks["ee8e8d15-496b-07ac-e5f6-8fae5d4c7b1a"].Result.Image;
+            skinData.PhantomBuddyName = buddyTasks["ee8e8d15-496b-07ac-e5f6-8fae5d4c7b1a"].Result.Name;
+            skinData.VandalBuddyImage = buddyTasks["9c82e19d-4575-0200-1a81-3eacf00cf872"].Result.Image;
+            skinData.VandalBuddyName = buddyTasks["9c82e19d-4575-0200-1a81-3eacf00cf872"].Result.Name;
+            skinData.MarshalBuddyImage = buddyTasks["c4883e50-4494-202c-3ec3-6b8a9284f00b"].Result.Image;
+            skinData.MarshalBuddyName = buddyTasks["c4883e50-4494-202c-3ec3-6b8a9284f00b"].Result.Name;
+            skinData.OutlawBuddyImage = buddyTasks["5f0aaf7a-4289-3998-d5ff-eb9a5cf7ef5c"].Result.Image;
+            skinData.OutlawBuddyName = buddyTasks["5f0aaf7a-4289-3998-d5ff-eb9a5cf7ef5c"].Result.Name;
+            skinData.OperatorBuddyImage = buddyTasks["a03b24d3-4319-996d-0f8c-94bbfba1dfc7"].Result.Image;
+            skinData.OperatorBuddyName = buddyTasks["a03b24d3-4319-996d-0f8c-94bbfba1dfc7"].Result.Name;
+            skinData.AresBuddyImage = buddyTasks["55d8a0f4-4274-ca67-fe2c-06ab45efdf58"].Result.Image;
+            skinData.AresBuddyName = buddyTasks["55d8a0f4-4274-ca67-fe2c-06ab45efdf58"].Result.Name;
+            skinData.OdinBuddyImage = buddyTasks["63e6c2b6-4a8e-869c-3d4c-e38355226584"].Result.Image;
+            skinData.OdinBuddyName = buddyTasks["63e6c2b6-4a8e-869c-3d4c-e38355226584"].Result.Name;
+            skinData.MeleeBuddyImage = buddyTasks["2f59173c-4bed-b6c3-2191-dea9b58be9c7"].Result.Image;
+            skinData.MeleeBuddyName = buddyTasks["2f59173c-4bed-b6c3-2191-dea9b58be9c7"].Result.Name;
+            
+            return skinData;
+        }
+
+        Constants.Log.Error("GetPartySkinInfoAsync Failed: {e}", response.ErrorException);
+        return new SkinData();
+    }
+
 
     private static async Task<SkinData> GetSkinInfoAsync(LoadoutLoadout loadout, Guid cardid)
     {
@@ -600,35 +1032,53 @@ public class LiveMatch
         ValNameImage defNI = new();
         ValCard defCard = new();
         ValCard card = SafeDict.GetValue(cards, cardid, defCard);
+        
+        // Log undefined sprays for debugging
+        if (loadout?.Sprays?.SpraySelections != null)
+        {
+            for (int i = 0; i < Math.Min(loadout.Sprays.SpraySelections.Length, 4); i++)
+            {
+                var sprayAssetId = loadout.Sprays.SpraySelections[i].AssetId;
+                // Removed undefined spray logging
+            }
+        }
+        
+        if (loadout?.Sprays?.SpraySelections == null || loadout.Items == null || skins == null)
+        {
+            Constants.Log.Error("GetSkinInfoAsync: loadout or skins data is null");
+            return new SkinData
+            {
+                CardImage = card.Image,
+                LargeCardImage = card.FullImage,
+                CardName = card.Name
+            };
+        }
+        var validSpraySelections = loadout.Sprays.SpraySelections.Where(s => s.AssetId.ToString() != "0a6db78c-48b9-a32d-c47a-82be597584c1").Take(4).ToList();
         var skinData = new SkinData
         {
             CardImage = card.Image,
             LargeCardImage = card.FullImage,
             CardName = card.Name,
-            Spray1Image = SafeDict
-                .GetValue(sprays, loadout.Sprays.SpraySelections[0].AssetId, defNI)
-                .Image,
-            Spray1Name = SafeDict
-                .GetValue(sprays, loadout.Sprays.SpraySelections[0].AssetId, defNI)
-                .Name,
-            Spray2Image = SafeDict
-                .GetValue(sprays, loadout.Sprays.SpraySelections[1].AssetId, defNI)
-                .Image,
-            Spray2Name = SafeDict
-                .GetValue(sprays, loadout.Sprays.SpraySelections[1].AssetId, defNI)
-                .Name,
-            Spray3Image = SafeDict
-                .GetValue(sprays, loadout.Sprays.SpraySelections[2].AssetId, defNI)
-                .Image,
-            Spray3Name = SafeDict
-                .GetValue(sprays, loadout.Sprays.SpraySelections[2].AssetId, defNI)
-                .Name,
-            Spray4Image = SafeDict
-                .GetValue(sprays, loadout.Sprays.SpraySelections[3].AssetId, defNI)
-                .Image,
-            Spray4Name = SafeDict
-                .GetValue(sprays, loadout.Sprays.SpraySelections[3].AssetId, defNI)
-                .Name,
+            Spray1Image = validSpraySelections.Count > 0 ? SafeDict
+                .GetValue(sprays, validSpraySelections[0].AssetId, defNI)
+                .Image : defNI.Image,
+            Spray1Name = validSpraySelections.Count > 0 ? SafeDict
+                .GetValue(sprays, validSpraySelections[0].AssetId, defNI)
+                .Name : defNI.Name,
+            Spray2Image = validSpraySelections.Count > 1 ? SafeDict
+                .GetValue(sprays, validSpraySelections[1].AssetId, defNI)
+                .Image : defNI.Image,
+            Spray2Name = validSpraySelections.Count > 1 ? SafeDict
+                .GetValue(sprays, validSpraySelections[1].AssetId, defNI)
+                .Name : defNI.Name,
+            Spray3Image = validSpraySelections.Count > 2 ? SafeDict
+                .GetValue(sprays, validSpraySelections[2].AssetId, defNI)
+                .Image : defNI.Image,
+            Spray3Name = validSpraySelections.Count > 2 ? SafeDict
+                .GetValue(sprays, validSpraySelections[2].AssetId, defNI)
+                .Name : defNI.Name,
+            Spray4Image = defNI.Image,
+            Spray4Name = defNI.Name,
             ClassicImage = skins[
                 loadout.Items["29a0cfab-485b-f5d5-779a-b59f85e204a8"].Sockets[
                     "3ad1b2b2-acdb-4524-852f-954a76ddae0a"
@@ -680,6 +1130,20 @@ public class LiveMatch
             ].Image,
             GhostName = skins[
                 loadout.Items["1baa85b4-4c70-1284-64bb-6481dfc3bb4e"].Sockets[
+                    "3ad1b2b2-acdb-4524-852f-954a76ddae0a"
+                ]
+                    .Item
+                    .Id
+            ].Name,
+            BanditImage = skins[
+                loadout.Items["410b2e0b-4ceb-1321-1727-20858f7f3477"].Sockets[
+                    "3ad1b2b2-acdb-4524-852f-954a76ddae0a"
+                ]
+                    .Item
+                    .Id
+            ].Image,
+            BanditName = skins[
+                loadout.Items["410b2e0b-4ceb-1321-1727-20858f7f3477"].Sockets[
                     "3ad1b2b2-acdb-4524-852f-954a76ddae0a"
                 ]
                     .Item
@@ -926,6 +1390,10 @@ public class LiveMatch
                 .ConfigureAwait(false);
             if (!response.IsSuccessful)
             {
+                if (response.StatusCode == (HttpStatusCode)429) // Too Many Requests
+                {
+                    await Task.Delay(5000); // Wait 5 seconds before retry
+                }
                 Constants.Log.Error(
                     "GetMatchHistoryAsync request failed: {e}",
                     response.ErrorException
@@ -942,7 +1410,7 @@ public class LiveMatch
                 options
             );
 
-            if (content?.Matches.Length == 0)
+            if (content?.Matches == null || content.Matches.Length == 0)
             {
                 return history;
             }
@@ -951,7 +1419,7 @@ public class LiveMatch
 
             for (int i = 0; i < 3; i++)
             {
-                if (i > content.Matches.Length)
+                if (i >= content.Matches.Length)
                     break;
                 var match = content.Matches[i].RankedRatingEarned;
                 history.PreviousGames[i] = Math.Abs(match);
@@ -1010,7 +1478,7 @@ public class LiveMatch
 
         if (content.QueueSkills.Competitive.SeasonalInfoBySeasonId is null)
         {
-            Constants.Log.Error("GetPlayerHistoryAsync Failed; seasonInfoById is null");
+            Constants.Log.Warning("GetPlayerHistoryAsync: seasonInfoById is null, returning default rank data");
             return rankData;
         }
 
@@ -1141,35 +1609,22 @@ public class LiveMatch
         return seasonData;
     }
 
-    private static async Task<Uri> TrackerAsync(string username)
+    private static Task<Uri> TrackerAsync(string username)
     {
         if (string.IsNullOrEmpty(username))
-            return null;
+            return Task.FromResult<Uri>(null);
+        
         try
         {
             var encodedUsername = Uri.EscapeDataString(username);
-            var url = new Uri(
-                "https://api.tracker.network/api/v2/valorant/standard/profile/riot/"
-                    + encodedUsername
-            );
-            var response = await DoCachedRequestAsync(
-                    Method.Get,
-                    url.ToString(),
-                    false,
-                    false,
-                    false,
-                    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.141 Safari/537.36 OverwolfClient/0.190.0.13"
-                )
-                .ConfigureAwait(false);
-            var numericStatusCode = (short)response.StatusCode;
-            if (numericStatusCode == 200)
-                return new Uri("https://tracker.gg/valorant/profile/riot/" + encodedUsername);
+            // Directly return the link without validation
+            return Task.FromResult(new Uri("https://tracker.gg/valorant/profile/riot/" + encodedUsername));
         }
         catch (Exception e)
         {
             Constants.Log.Error("TrackerAsync Failed: {Exception}", e);
         }
-        return null;
+        return Task.FromResult<Uri>(null);
     }
 
     private static async Task<PresencesResponse> GetPresencesAsync()
@@ -1197,12 +1652,6 @@ public class LiveMatch
             .AddHeader("Authorization", $"Basic {base64String}")
             .AddHeader("X-Riot-ClientPlatform", Constants.Platform)
             .AddHeader("X-Riot-ClientVersion", Constants.Version);
-        client.UseSystemTextJson(
-            new JsonSerializerOptions
-            {
-                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault
-            }
-        );
         var response = await client
             .ExecuteGetAsync<PresencesResponse>(request)
             .ConfigureAwait(false);
@@ -1222,7 +1671,25 @@ public class LiveMatch
 
         try
         {
-            var friend = presences.Presences.First(friend => friend.Puuid == puuid);
+            if (presences?.Presences == null)
+            {
+                Constants.Log.Warning("GetPresenceInfoAsync: Presences is null");
+                return playerUiData;
+            }
+
+            var friend = presences.Presences.FirstOrDefault(f => f.Puuid == puuid);
+            if (friend == null)
+            {
+                // Not in friend list, expected for random players
+                return playerUiData;
+            }
+
+            if (string.IsNullOrEmpty(friend.Private))
+            {
+                // Private data empty
+                return playerUiData;
+            }
+
             var json = Encoding.UTF8.GetString(Convert.FromBase64String(friend.Private));
             var content = JsonSerializer.Deserialize<PresencesPrivate>(json);
             if (content == null)
@@ -1238,11 +1705,13 @@ public class LiveMatch
                     .ConfigureAwait(false)
             );
 
-            maps.TryGetValue(content.MatchMap, out var map);
-            MatchInfo.Map = map.Name;
-            MatchInfo.MapImage = new Uri(
-                Constants.LocalAppDataPath + $"\\ValAPI\\mapsimg\\{map.UUID}.png"
-            );
+            if (maps != null && !string.IsNullOrEmpty(content.MatchMap) && maps.TryGetValue(content.MatchMap, out var map))
+            {
+                MatchInfo.Map = map.Name;
+                MatchInfo.MapImage = new Uri(
+                    Constants.LocalAppDataPath + $"\\ValAPI\\mapsimg\\{map.UUID}.png"
+                );
+            }
             playerUiData.BackgroundColour = "#181E34";
             Constants.PPartyId = content.PartyId;
 
@@ -1297,14 +1766,32 @@ public class LiveMatch
 
             if (string.IsNullOrEmpty(gameModeName))
             {
-                var gamemodes = JsonSerializer.Deserialize<Dictionary<Guid, string>>(
-                    await File.ReadAllTextAsync(
-                            Constants.LocalAppDataPath + "\\ValAPI\\gamemode.json"
-                        )
-                        .ConfigureAwait(false)
-                );
-                gamemodes.TryGetValue(gameModeId, out var gamemode);
-                MatchInfo.GameMode = gamemode;
+                try 
+                {
+                    var jsonContent = await File.ReadAllTextAsync(Constants.LocalAppDataPath + "\\ValAPI\\gamemode.json").ConfigureAwait(false);
+                    
+                    // Check if JSON is in new format (Dictionary<string, ValGamemodeInfo>) or old format
+                    if (jsonContent.Contains("\"AssetPath\""))
+                    {
+                        var gamemodes = JsonSerializer.Deserialize<Dictionary<string, ValGamemodeInfo>>(jsonContent);
+                        if (gamemodes.TryGetValue(gameModeId.ToString(), out var info))
+                        {
+                            MatchInfo.GameMode = info.Name;
+                        }
+                    }
+                    else
+                    {
+                        // Fallback to old format
+                        var gamemodes = JsonSerializer.Deserialize<Dictionary<Guid, string>>(jsonContent);
+                        gamemodes.TryGetValue(gameModeId, out var gamemode);
+                        MatchInfo.GameMode = gamemode;
+                    }
+                }
+                catch (JsonException)
+                {
+                    // Handle JSON parsing errors gracefully
+                    Constants.Log.Warning("GetPresenceInfoAsync: Failed to parse gamemode.json");
+                }
             }
 
             MatchInfo.GameModeImage = new Uri(

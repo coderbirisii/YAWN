@@ -1,9 +1,6 @@
-#define public Dependency_NoExampleSetup
-#include ".\InnoDependencyInstaller\CodeDependencies.iss"
-
 [Setup]
-#define MyAppSetupName 'NOWT'
-#define MyAppVersion '1.3.6'
+#define MyAppSetupName 'YAWN'
+#define MyAppVersion '1.3.8'
 #define MyAppPublisher 'PWall'
 #define MyAppCopyright 'Soneliem & PWall'
 #define MyAppURL 'https://github.com/pwall2222/NOWT'
@@ -20,12 +17,12 @@ AppUpdatesURL={#MyAppURL}
 OutputBaseFilename={#MyAppSetupName}
 DefaultGroupName={#MyAppSetupName}
 DefaultDirName={autopf}\{#MyAppSetupName}
-UninstallDisplayIcon=..\NOWT\Assets\logo.ico
-SetupIconFile=..\NOWT\Assets\logo.ico
+UninstallDisplayIcon=C:\Users\Coder\Desktop\NOWT\NOWT\logo.ico
+SetupIconFile=C:\Users\Coder\Desktop\NOWT\NOWT\logo.ico
 SourceDir=inno
 OutputDir=out
 AllowNoIcons=yes
-PrivilegesRequired=lowest
+PrivilegesRequired=admin
 PrivilegesRequiredOverridesAllowed=dialog
 
 ; remove next line if you only deploy 32-bit binaries and dependencies
@@ -38,31 +35,31 @@ Name: en; MessagesFile: "compiler:Default.isl"
 ; #ifdef UseNetCoreCheck
 ; download netcorecheck.exe: https://go.microsoft.com/fwlink/?linkid=2135256
 ; download netcorecheck_x64.exe: https://go.microsoft.com/fwlink/?linkid=2135504
-Source: "netcorecheck.exe"; Flags: dontcopy noencryption
-Source: "netcorecheck_x64.exe"; Flags: dontcopy noencryption
+;Source: "netcorecheck.exe"; Flags: dontcopy noencryption
+;Source: "netcorecheck_x64.exe"; Flags: dontcopy noencryption
 ; #endif
 
 ;#ifdef UseDirectX
 ;Source: "dxwebsetup.exe"; Flags: dontcopy noencryption
 ;#endif
 
-Source: "NOWT.exe"; DestDir: "{app}"; DestName: "NOWT.exe"; Check: Dependency_IsX64; Flags: ignoreversion
-Source: "WebView2Loader.dll"; DestDir: "{app}"; DestName: "WebView2Loader.dll"; Flags: ignoreversion
+Source: "YAWN.exe"; DestDir: "{app}"; DestName: "YAWN.exe"; Flags: ignoreversion
+Source: "*.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "*.xml"; DestDir: "{app}"; Flags: ignoreversion
+Source: "runtimes\*"; DestDir: "{app}\runtimes"; Flags: ignoreversion recursesubdirs
 [Icons]
-Name: "{group}\{#MyAppSetupName}"; Filename: "{app}\NOWT.exe"
+Name: "{group}\{#MyAppSetupName}"; Filename: "{app}\YAWN.exe"
 Name: "{group}\{cm:UninstallProgram,{#MyAppSetupName}}"; Filename: "{uninstallexe}"
-Name: "{userdesktop}\{#MyAppSetupName}"; Filename: "{app}\NOWT.exe"; Tasks: desktopicon
+Name: "{userdesktop}\{#MyAppSetupName}"; Filename: "{app}\YAWN.exe"; Tasks: desktopicon
 
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; Flags: unchecked
 
 [Run]
-Filename: "{app}\NOWT.exe"; Description: "{cm:LaunchProgram,{#MyAppSetupName}}"; Flags: nowait postinstall skipifsilent
+Filename: "{app}\YAWN.exe"; Description: "{cm:LaunchProgram,{#MyAppSetupName}}"; Flags: nowait postinstall skipifsilent runascurrentuser
 
 [Code]
 function InitializeSetup: Boolean;
 begin
-  ExtractTemporaryFile('netcorecheck_x64.exe');
-  Dependency_AddDotNet60Desktop;
   Result := True;
 end;

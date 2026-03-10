@@ -160,11 +160,45 @@ public static class Login
 
     private static async Task GetLatestVersionAsync()
     {
-        var lines = await File.ReadAllLinesAsync(
-                Constants.LocalAppDataPath + "\\ValAPI\\version.json"
-            )
-            .ConfigureAwait(false);
-        Constants.Version = lines[0];
+        try
+        {
+            var response = await DoCachedRequestAsync(
+                Method.Get,
+                "https://valorant-api.com/v1/version",
+                false,
+                true,
+                false
+            ).ConfigureAwait(false);
+            
+            if (response.IsSuccessful)
+            {
+                var versionData = JsonSerializer.Deserialize<VapiVersionResponse>(response.Content);
+                Constants.Version = versionData?.Data?.RiotClientVersion;
+                
+                if (!string.IsNullOrEmpty(Constants.Version))
+                {
+                    return;
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            Constants.Log.Warning("Failed to fetch version from API: {e}", e);
+        }
+        
+        var localVersionPath = Constants.LocalAppDataPath + "\\ValAPI\\version.json";
+        if (File.Exists(localVersionPath))
+        {
+            try
+            {
+                var lines = await File.ReadAllLinesAsync(localVersionPath).ConfigureAwait(false);
+                Constants.Version = lines[0];
+                return;
+            }
+            catch { }
+        }
+        
+        Constants.Version = "release-12.04-shipping-24-4354757";
     }
 
     public static async Task<RestResponse> DoCachedRequestAsync(

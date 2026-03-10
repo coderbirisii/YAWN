@@ -1,0 +1,164 @@
+{
+    "endpoints": [
+        {
+            "method": "GET",
+            "name": "Seasons",
+            "url": "https://valorant-api.com/v1/seasons",
+            "description": "",
+            "parameters": [
+                {
+                    "name": "language",
+                    "type": "string",
+                    "description": "Sets the output language",
+                    "default": "en-US",
+                    "required": false
+                }
+            ],
+            "responses": [
+                {
+                    "status_code": 200,
+                    "description": "Success",
+                    "schema": [
+                        "object {2}",
+                        "status int32",
+                        "data object[] {8}",
+                        "uuid string",
+                        "displayName string (localized)",
+                        "title string (localized)",
+                        "type string",
+                        "startTime dateTime",
+                        "endTime dateTime",
+                        "parentUuid string",
+                        "assetPath string"
+                    ]
+                },
+                {
+                    "status_code": 400,
+                    "description": "Bad Request",
+                    "schema": [
+                        "object {2}",
+                        "status int32",
+                        "error string"
+                    ]
+                }
+            ],
+            "info": "Returns data of all seasons"
+        },
+        {
+            "method": "GET",
+            "name": "Competitive Seasons",
+            "url": "https://valorant-api.com/v1/seasons/competitive",
+            "description": "",
+            "parameters": [],
+            "responses": [
+                {
+                    "status_code": 200,
+                    "description": "Success",
+                    "schema": [
+                        "object {2}",
+                        "status int32",
+                        "data object[] {8}",
+                        "uuid string",
+                        "displayName string (localized)",
+                        "title string (localized)",
+                        "type string",
+                        "startTime dateTime",
+                        "endTime dateTime",
+                        "parentUuid string",
+                        "assetPath string"
+                    ]
+                }
+            ],
+            "info": "Returns data of all competitive seasons"
+        },
+        {
+            "method": "GET",
+            "name": "Season by Uuid",
+            "url": "https://valorant-api.com/v1/seasons/{seasonUuid}",
+            "description": "",
+            "parameters": [
+                {
+                    "name": "language",
+                    "type": "string",
+                    "description": "Sets the output language",
+                    "default": "en-US",
+                    "required": false
+                }
+            ],
+            "responses": [
+                {
+                    "status_code": 200,
+                    "description": "Success",
+                    "schema": [
+                        "object {2}",
+                        "status int32",
+                        "data object[] {8}",
+                        "uuid string",
+                        "displayName string (localized)",
+                        "title string (localized)",
+                        "type string",
+                        "startTime dateTime",
+                        "endTime dateTime",
+                        "parentUuid string",
+                        "assetPath string"
+                    ]
+                },
+                {
+                    "status_code": 400,
+                    "description": "Bad Request",
+                    "schema": [
+                        "object {2}",
+                        "status int32",
+                        "error string"
+                    ]
+                },
+                {
+                    "status_code": 404,
+                    "description": "Not Found",
+                    "schema": [
+                        "object {2}",
+                        "status int32",
+                        "error string"
+                    ]
+                }
+            ],
+            "info": "Returns data of the requested season"
+        },
+        {
+            "method": "GET",
+            "name": "Competitive Season by Uuid",
+            "url": "https://valorant-api.com/v1/seasons/competitive/{competitiveSeasonUuid}",
+            "description": "",
+            "parameters": [],
+            "responses": [
+                {
+                    "status_code": 200,
+                    "description": "Success",
+                    "schema": [
+                        "object {2}",
+                        "status int32",
+                        "data object[] {8}",
+                        "uuid string",
+                        "displayName string (localized)",
+                        "title string (localized)",
+                        "type string",
+                        "startTime dateTime",
+                        "endTime dateTime",
+                        "parentUuid string",
+                        "assetPath string"
+                    ]
+                },
+                {
+                    "status_code": 404,
+                    "description": "Not Found",
+                    "schema": [
+                        "object {2}",
+                        "status int32",
+                        "error string"
+                    ]
+                }
+            ],
+            "info": "Returns data of the requested competitive season"
+        }
+    ]
+}

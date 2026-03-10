@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -24,6 +24,9 @@ public static class ValApi
     private static Urls _cardsInfo;
     private static Urls _spraysInfo;
     private static Urls _gamemodeInfo;
+    private static Urls _buddiesInfo;
+    private static Urls _titlesInfo;
+    private static Urls _contentTiersInfo;
     private static List<Urls> _allInfo;
 
     private static readonly Dictionary<string, string> ValApiLanguages =
@@ -134,6 +137,24 @@ public static class ValApi
             Filepath = Constants.LocalAppDataPath + "\\ValAPI\\gamemode.json",
             Url = $"/gamemodes?language={language}"
         };
+        _buddiesInfo = new Urls
+        {
+            Name = "Buddies",
+            Filepath = Constants.LocalAppDataPath + "\\ValAPI\\buddies.json",
+            Url = $"/buddies/levels?language={language}"
+        };
+        _titlesInfo = new Urls
+        {
+            Name = "Titles",
+            Filepath = Constants.LocalAppDataPath + "\\ValAPI\\titles.json",
+            Url = $"/playertitles?language={language}"
+        };
+        _contentTiersInfo = new Urls
+        {
+            Name = "ContentTiers",
+            Filepath = Constants.LocalAppDataPath + "\\ValAPI\\contenttiers.json",
+            Url = $"/contenttiers?language={language}"
+        };
         _allInfo = new List<Urls>
         {
             _mapsInfo,
@@ -143,13 +164,17 @@ public static class ValApi
             _skinsInfo,
             _cardsInfo,
             _spraysInfo,
-            _gamemodeInfo
+            _gamemodeInfo,
+            _buddiesInfo,
+            _titlesInfo,
+            _contentTiersInfo
         };
         return Task.CompletedTask;
     }
 
     public static async Task UpdateFilesAsync()
     {
+        Constants.Log.Information("UpdateFilesAsync: Starting file update");
         try
         {
             await GetUrlsAsync().ConfigureAwait(false);
@@ -206,7 +231,16 @@ public static class ValApi
                             .DownloadDataAsync(request)
                             .ConfigureAwait(false);
                         if (response != null)
-                            await File.WriteAllBytesAsync(fileName, response).ConfigureAwait(false);
+                        {
+                            try
+                            {
+                                await File.WriteAllBytesAsync(fileName, response).ConfigureAwait(false);
+                            }
+                            catch (IOException)
+                            {
+                                Constants.Log.Warning("Map image in use, skipping update: {Path}", fileName);
+                            }
+                        }
                     }
 
                 await File.WriteAllTextAsync(
@@ -242,7 +276,16 @@ public static class ValApi
                             .DownloadDataAsync(request)
                             .ConfigureAwait(false);
                         if (response != null)
-                            await File.WriteAllBytesAsync(fileName, response).ConfigureAwait(false);
+                        {
+                            try
+                            {
+                                await File.WriteAllBytesAsync(fileName, response).ConfigureAwait(false);
+                            }
+                            catch (IOException)
+                            {
+                                Constants.Log.Warning("Agent image in use, skipping update: {Path}", fileName);
+                            }
+                        }
                     }
 
                 await File.WriteAllTextAsync(
@@ -321,14 +364,30 @@ public static class ValApi
                 Dictionary<Guid, ValNameImage> spraysDictionary = new();
                 if (spraysResponse.Data != null)
                     foreach (var spray in spraysResponse.Data.Data)
+                    {
+                        var image = spray.FullTransparentIcon ?? spray.DisplayIcon ?? (spray.Levels.Length > 0 ? spray.Levels[0].DisplayIcon : null);
+                        
+                        if (image == null)
+                        {
+                            Constants.Log.Warning(
+                                "Spray image is NULL - UUID: {Uuid}, Name: {Name}, FullTransparentIcon: {FullIcon}, DisplayIcon: {DisplayIcon}, LevelsCount: {LevelsCount}",
+                                spray.Uuid,
+                                spray.DisplayName,
+                                spray.FullTransparentIcon?.ToString() ?? "null",
+                                spray.DisplayIcon?.ToString() ?? "null",
+                                spray.Levels.Length
+                            );
+                        }
+                        
                         spraysDictionary.TryAdd(
                             spray.Uuid,
                             new ValNameImage
                             {
                                 Name = spray.DisplayName,
-                                Image = spray.FullTransparentIcon
+                                Image = image
                             }
                         );
+                    }
                 await File.WriteAllTextAsync(
                         _spraysInfo.Filepath,
                         JsonSerializer.Serialize(spraysDictionary)
@@ -366,9 +425,6 @@ public static class ValApi
                                 continue;
                             case 0:
                             {
-                                // File.Copy(Directory.GetCurrentDirectory() + "\\Assets\\0.png",
-                                //     Constants.LocalAppDataPath + "\\ValAPI\\ranksimg\\0.png", true);
-
                                 const string imagePath = "pack://application:,,,/Assets/0.png";
                                 var imageInfo = Application.GetResourceStream(new Uri(imagePath));
                                 using var ms = new MemoryStream();
@@ -376,10 +432,22 @@ public static class ValApi
                                 {
                                     await imageInfo.Stream.CopyToAsync(ms);
                                     var imageBytes = ms.ToArray();
-                                    await File.WriteAllBytesAsync(
-                                        Constants.LocalAppDataPath + "\\ValAPI\\ranksimg\\0.png",
-                                        imageBytes
-                                    );
+                                    
+                                    var filePath = Constants.LocalAppDataPath + "\\ValAPI\\ranksimg\\0.png";
+                                    
+                                    try
+                                    {
+                                        if (File.Exists(filePath))
+                                        {
+                                            File.Delete(filePath);
+                                        }
+                                        await using var fs = new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.None);
+                                        await fs.WriteAsync(imageBytes);
+                                    }
+                                    catch (IOException)
+                                    {
+                                        Constants.Log.Warning("0.png file in use, skipping update");
+                                    }
                                 }
 
                                 continue;
@@ -394,9 +462,22 @@ public static class ValApi
                             .DownloadDataAsync(request)
                             .ConfigureAwait(false);
 
-                        // if (response.IsCompletedSuccessfully)
                         if (response != null)
-                            await File.WriteAllBytesAsync(fileName, response).ConfigureAwait(false);
+                        {
+                            try
+                            {
+                                if (File.Exists(fileName))
+                                {
+                                    File.Delete(fileName);
+                                }
+                                await using var fs = new FileStream(fileName, FileMode.Create, FileAccess.Write, FileShare.None);
+                                await fs.WriteAsync(response);
+                            }
+                            catch (IOException)
+                            {
+                                Constants.Log.Warning("Rank file in use, skipping: {FileName}", fileName);
+                            }
+                        }
                     }
 
                 await File.WriteAllTextAsync(
@@ -417,7 +498,7 @@ public static class ValApi
                     );
                     return;
                 }
-                Dictionary<Guid, string> gamemodeDictionary = new();
+                Dictionary<string, ValGamemodeInfo> gamemodeDictionary = new();
                 if (!Directory.Exists(Constants.LocalAppDataPath + "\\ValAPI\\gamemodeimg"))
                     Directory.CreateDirectory(Constants.LocalAppDataPath + "\\ValAPI\\gamemodeimg");
                 if (gameModeResponse.Data != null)
@@ -425,7 +506,20 @@ public static class ValApi
                     {
                         if (gamemode.DisplayIcon == null)
                             continue;
-                        gamemodeDictionary.TryAdd(gamemode.Uuid, gamemode.DisplayName);
+                        
+                        // Use AssetPath as key if available, otherwise Uuid
+                        var key = !string.IsNullOrEmpty(gamemode.AssetPath) ? gamemode.AssetPath : gamemode.Uuid.ToString();
+                        
+                        var info = new ValGamemodeInfo 
+                        { 
+                            Uuid = gamemode.Uuid, 
+                            Name = gamemode.DisplayName,
+                            AssetPath = gamemode.AssetPath
+                        };
+                        
+                        gamemodeDictionary.TryAdd(key, info);
+                        // Also add UUID as key for fallback lookups
+                        gamemodeDictionary.TryAdd(gamemode.Uuid.ToString(), info);
 
                         var fileName =
                             Constants.LocalAppDataPath
@@ -434,13 +528,103 @@ public static class ValApi
                         var response = await MediaClient
                             .DownloadDataAsync(request)
                             .ConfigureAwait(false);
+                        
                         if (response != null)
-                            await File.WriteAllBytesAsync(fileName, response).ConfigureAwait(false);
+                        {
+                            try 
+                            {
+                                await File.WriteAllBytesAsync(fileName, response).ConfigureAwait(false);
+                            }
+                            catch (IOException)
+                            {
+                                // File is likely in use, skip updating this specific image
+                                Constants.Log.Warning("Gamemode image in use, skipping update: {Path}", fileName);
+                            }
+                        }
                     }
 
                 await File.WriteAllTextAsync(
                         _gamemodeInfo.Filepath,
                         JsonSerializer.Serialize(gamemodeDictionary)
+                    )
+                    .ConfigureAwait(false);
+            }
+
+            async Task UpdateBuddiesDictionary()
+            {
+                var buddiesResponse = await Fetch<ValApiBuddiesResponse>(_buddiesInfo.Url);
+                if (!buddiesResponse.IsSuccessful)
+                {
+                    Constants.Log.Error(
+                        "updateBuddiesDictionary Failed, Response:{error}",
+                        buddiesResponse.ErrorException
+                    );
+                    return;
+                }
+                Dictionary<Guid, ValNameImage> buddiesDictionary = new();
+                if (buddiesResponse.Data?.Data != null)
+                    foreach (var buddy in buddiesResponse.Data.Data)
+                        buddiesDictionary.TryAdd(
+                            buddy.Uuid,
+                            new ValNameImage { Name = buddy.DisplayName, Image = buddy.DisplayIcon }
+                        );
+                await File.WriteAllTextAsync(
+                        _buddiesInfo.Filepath,
+                        JsonSerializer.Serialize(buddiesDictionary)
+                    )
+                    .ConfigureAwait(false);
+            }
+
+            async Task UpdateTitlesDictionary()
+            {
+                var titlesResponse = await Fetch<ValApiPlayerTitlesResponse>(_titlesInfo.Url);
+                if (!titlesResponse.IsSuccessful)
+                {
+                    Constants.Log.Error(
+                        "updateTitlesDictionary Failed, Response:{error}",
+                        titlesResponse.ErrorException
+                    );
+                    return;
+                }
+                Dictionary<Guid, string> titlesDictionary = new();
+                if (titlesResponse.Data?.Data != null)
+                    foreach (var title in titlesResponse.Data.Data)
+                        titlesDictionary.TryAdd(title.Uuid, title.TitleText ?? title.DisplayName);
+                await File.WriteAllTextAsync(
+                        _titlesInfo.Filepath,
+                        JsonSerializer.Serialize(titlesDictionary)
+                    )
+                    .ConfigureAwait(false);
+            }
+
+            async Task UpdateContentTiersDictionary()
+            {
+                var contentTiersResponse = await Fetch<ValApiContentTiersResponse>(_contentTiersInfo.Url);
+                if (!contentTiersResponse.IsSuccessful)
+                {
+                    Constants.Log.Error(
+                        "updateContentTiersDictionary Failed, Response:{error}",
+                        contentTiersResponse.ErrorException
+                    );
+                    return;
+                }
+                Dictionary<Guid, ValContentTier> contentTiersDictionary = new();
+                if (contentTiersResponse.Data?.Data != null)
+                    foreach (var tier in contentTiersResponse.Data.Data)
+                        contentTiersDictionary.TryAdd(
+                            tier.Uuid,
+                            new ValContentTier
+                            {
+                                Name = tier.DisplayName,
+                                DevName = tier.DevName,
+                                Rank = tier.Rank,
+                                HighlightColor = tier.HighlightColor,
+                                Icon = tier.DisplayIcon
+                            }
+                        );
+                await File.WriteAllTextAsync(
+                        _contentTiersInfo.Filepath,
+                        JsonSerializer.Serialize(contentTiersDictionary)
                     )
                     .ConfigureAwait(false);
             }
@@ -455,7 +639,10 @@ public static class ValApi
                         UpdateSkinsDictionary(),
                         UpdateCardsDictionary(),
                         UpdateSpraysDictionary(),
-                        UpdateGamemodeDictionary()
+                        UpdateGamemodeDictionary(),
+                        UpdateBuddiesDictionary(),
+                        UpdateTitlesDictionary(),
+                        UpdateContentTiersDictionary()
                     )
                     .ConfigureAwait(false);
             }
@@ -471,28 +658,176 @@ public static class ValApi
         {
             Constants.Log.Error("UpdateFilesAsync Failed, Response:{error}", e);
         }
+        
+        Constants.Log.Information("UpdateFilesAsync: File update completed");
+    }
+
+    public static string GetMapName(string mapUrl)
+    {
+        try
+        {
+            var maps = JsonSerializer.Deserialize<Dictionary<string, ValMap>>(
+                File.ReadAllText(Constants.LocalAppDataPath + "\\ValAPI\\maps.json")
+            );
+            if (maps.TryGetValue(mapUrl, out var map))
+                return map.Name;
+        }
+        catch { }
+        
+        return mapUrl switch
+        {
+            "/Game/Maps/Ascent/Ascent" => "ASCENT",
+            "/Game/Maps/Bonsai/Bonsai" => "SPLIT",
+            "/Game/Maps/Canyon/Canyon" => "FRACTURE",
+            "/Game/Maps/Duality/Duality" => "BIND",
+            "/Game/Maps/Foxtrot/Foxtrot" => "BREEZE",
+            "/Game/Maps/Jam/Jam" => "LOTUS",
+            "/Game/Maps/Infinity/Infinity" => "ABYSS",
+            "/Game/Maps/Juliett/Juliett" => "SUNSET",
+            "/Game/Maps/Pitt/Pitt" => "PEARL",
+            "/Game/Maps/Port/Port" => "ICEBOX",
+            "/Game/Maps/Triad/Triad" => "HAVEN",
+            "/Game/Maps/HURM/HURM_Yard/HURM_Yard" => "PIAZZA",
+            "/Game/Maps/HURM/HURM_Alley/HURM_Alley" => "DISTRICT",
+            "/Game/Maps/HURM/HURM_Bowl/HURM_Bowl" => "KASBAH",
+            "/Game/Maps/HURM/HURM_Helix/HURM_Helix" => "DRIFT",
+            _ => "UNKNOWN MAP"
+        };
+    }
+
+    public static string GetMapIdFromUrl(string mapUrl)
+    {
+        try
+        {
+            var mapsText = File.ReadAllText(Constants.LocalAppDataPath + "\\ValAPI\\maps.json");
+            var maps = JsonSerializer.Deserialize<Dictionary<string, ValMap>>(mapsText);
+            if (maps != null && maps.TryGetValue(mapUrl, out var map))
+                return map.UUID.ToString().ToLower();
+        }
+        catch (Exception ex)
+        {
+            Constants.Log.Error("GetMapIdFromUrl failed for {MapUrl}: {Error}", mapUrl, ex.Message);
+        }
+        return null;
+    }
+
+    public static string GetQueueName(string queueId)
+    {
+        try
+        {
+            var jsonContent = File.ReadAllText(Constants.LocalAppDataPath + "\\ValAPI\\gamemode.json");
+            
+            // Check if JSON content is in old format (Dictionary<string, string>)
+            if (jsonContent.Trim().StartsWith("{\""))
+            {
+                // Simple heuristic check: see if values are strings or objects
+                // But since we control the serialization, we can try to deserialize as new format first
+                // If it fails, fallback to old format handling or just catch exception
+                
+                try 
+                {
+                    var queues = JsonSerializer.Deserialize<Dictionary<string, ValGamemodeInfo>>(jsonContent);
+                    if (queues != null)
+                    {
+                        // Try to find by key (AssetPath or Uuid)
+                        if (queues.TryGetValue(queueId, out var info))
+                            return info.Name;
+                            
+                        // Fallback: try to find by Uuid if queueId is a Guid string
+                        if (Guid.TryParse(queueId, out var guid))
+                        {
+                            var match = queues.Values.FirstOrDefault(q => q.Uuid == guid);
+                            if (match != null) return match.Name;
+                        }
+                    }
+                }
+                catch (JsonException)
+                {
+                    // Fallback for backward compatibility if file hasn't been updated yet
+                    var queuesOld = JsonSerializer.Deserialize<Dictionary<string, string>>(jsonContent);
+                    if (queuesOld != null && queuesOld.TryGetValue(queueId, out var name))
+                        return name;
+                }
+            }
+        }
+        catch { }
+        
+        return queueId switch
+        {
+            "unrated" => "STANDART",
+            "competitive" => "REKABET\u00C7\u0130",
+            "swiftplay" => "TAM GAZ",
+            "spikerush" => "SPIKE\u0027A H\u00DCCUM",
+            "deathmatch" => "\u00D6L\u00DCM KALIM SAVA\u015EI",
+            "ggteam" => "TIRMANI\u015E",
+            "onefortheall" => "KOPYA",
+            "snowball" => "KARTOPU \u00C7ATI\u015EMASI",
+            "hurm" => "TAKIMLI \u00D6L\u00DCM KALIM SAVA\u015EI",
+            _ => queueId?.ToUpper() ?? "CUSTOM"
+        };
+    }
+
+    public static ValGamemodeInfo GetGamemodeInfo(string modeId)
+    {
+        try
+        {
+            var jsonContent = File.ReadAllText(Constants.LocalAppDataPath + "\\ValAPI\\gamemode.json");
+            Dictionary<string, ValGamemodeInfo> queues = null;
+
+            try 
+            {
+                queues = JsonSerializer.Deserialize<Dictionary<string, ValGamemodeInfo>>(jsonContent);
+            }
+            catch (JsonException)
+            {
+                // File might be in old format, force update or return null
+                Constants.Log.Warning("GetGamemodeInfo: gamemode.json is in old format or invalid.");
+                return null;
+            }
+            
+            if (queues != null && queues.TryGetValue(modeId, out var info))
+                return info;
+        }
+        catch (Exception ex)
+        {
+            Constants.Log.Error("GetGamemodeInfo failed for {ModeId}: {Error}", modeId, ex.Message);
+        }
+        return null;
     }
 
     public static async Task CheckAndUpdateJsonAsync()
     {
         try
         {
+            Constants.Log.Information("CheckAndUpdateJsonAsync: Starting file check");
             await GetUrlsAsync().ConfigureAwait(false);
 
-            if (
-                await GetValApiVersionAsync().ConfigureAwait(false)
-                != await GetLocalValApiVersionAsync().ConfigureAwait(false)
-            )
+            var remoteVersion = await GetValApiVersionAsync().ConfigureAwait(false);
+            var localVersion = await GetLocalValApiVersionAsync().ConfigureAwait(false);
+            
+            Constants.Log.Information("CheckAndUpdateJsonAsync: Remote version={Remote}, Local version={Local}", remoteVersion, localVersion);
+            
+            if (remoteVersion != localVersion || true) // Force update to get new sprays/assets
             {
+                Constants.Log.Information("CheckAndUpdateJsonAsync: Updating files to ensure latest assets");
                 await UpdateFilesAsync().ConfigureAwait(false);
                 return;
             }
 
-            if (_allInfo.Any(url => !File.Exists(url.Filepath)))
+            var missingFiles = _allInfo.Where(url => !File.Exists(url.Filepath)).ToList();
+            if (missingFiles.Any())
+            {
+                Constants.Log.Information("CheckAndUpdateJsonAsync: {Count} missing files detected, updating", missingFiles.Count);
                 await UpdateFilesAsync().ConfigureAwait(false);
+            }
+            else
+            {
+                Constants.Log.Information("CheckAndUpdateJsonAsync: All files up to date");
+            }
         }
-        catch (Exception)
+        catch (Exception e)
         {
+            Constants.Log.Error("CheckAndUpdateJsonAsync Failed: {e}", e);
             // ignored
         }
     }

@@ -1,0 +1,95 @@
+{
+    "endpoints": [
+        {
+            "method": "GET",
+            "name": "Themes",
+            "url": "https://valorant-api.com/v1/themes",
+            "description": "",
+            "parameters": [
+                {
+                    "name": "language",
+                    "type": "string",
+                    "description": "Sets the output language",
+                    "default": "en-US",
+                    "required": false
+                }
+            ],
+            "responses": [
+                {
+                    "status_code": 200,
+                    "description": "Success",
+                    "schema": [
+                        "object {2}",
+                        "status int32",
+                        "data object[] {5}",
+                        "uuid string",
+                        "displayName string (localized)",
+                        "displayIcon string",
+                        "storeFeaturedImage string",
+                        "assetPath string"
+                    ]
+                },
+                {
+                    "status_code": 400,
+                    "description": "Bad Request",
+                    "schema": [
+                        "object {2}",
+                        "status int32",
+                        "error string"
+                    ]
+                }
+            ],
+            "info": "Returns data and assets of all themes"
+        },
+        {
+            "method": "GET",
+            "name": "Theme by Uuid",
+            "url": "https://valorant-api.com/v1/themes/{themeUuid}",
+            "description": "",
+            "parameters": [
+                {
+                    "name": "language",
+                    "type": "string",
+                    "description": "Sets the output language",
+                    "default": "en-US",
+                    "required": false
+                }
+            ],
+            "responses": [
+                {
+                    "status_code": 200,
+                    "description": "Success",
+                    "schema": [
+                        "object {2}",
+                        "status int32",
+                        "data object[] {5}",
+                        "uuid string",
+                        "displayName string (localized)",
+                        "displayIcon string",
+                        "storeFeaturedImage string",
+                        "assetPath string"
+                    ]
+                },
+                {
+                    "status_code": 400,
+                    "description": "Bad Request",
+                    "schema": [
+                        "object {2}",
+                        "status int32",
+                        "error string"
+                    ]
+                },
+                {
+                    "status_code": 404,
+                    "description": "Not Found",
+                    "schema": [
+                        "object {2}",
+                        "status int32",
+                        "error string"
+                    ]
+                }
+            ],
+            "info": "Returns data and assets of the requested theme"
+        }
+    ]
+}

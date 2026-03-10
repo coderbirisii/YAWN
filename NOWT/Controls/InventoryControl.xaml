@@ -4,6 +4,7 @@
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 	xmlns:controls="clr-namespace:NOWT.Controls"
+	xmlns:converters="clr-namespace:NOWT.Converters"
 	xmlns:fa6="http://schemas.fontawesome.com/icons/fonts"
 	x:Name="Self" HorizontalAlignment="Stretch"
 	mc:Ignorable="d" Background="Transparent"
@@ -20,6 +21,7 @@
 				<ColumnDefinition />
 				<ColumnDefinition />
 				<ColumnDefinition />
+				<ColumnDefinition />
 			</Grid.ColumnDefinitions>
 			<Grid.RowDefinitions>
 				<RowDefinition />
@@ -30,10 +32,15 @@
 				<RowDefinition />
 			</Grid.RowDefinitions>
 
-			<TextBlock Grid.Column="1" Grid.ColumnSpan="4" Grid.Row="0"
-				Text="{Binding Username, ElementName=Self}"
-				FontSize="30" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center"
-				VerticalAlignment="Center" Margin="10" />
+			<StackPanel Grid.Column="1" Grid.ColumnSpan="5" Grid.Row="0" 
+				HorizontalAlignment="Center" VerticalAlignment="Center" Margin="10">
+				<TextBlock Text="{Binding Username, ElementName=Self}"
+					FontSize="30" FontWeight="Bold" Foreground="White" 
+					HorizontalAlignment="Center" TextAlignment="Center" />
+				<TextBlock Text="{Binding SkinDataObject.PlayerTitle, ElementName=Self}"
+					FontSize="16" Foreground="#32e2b2" 
+					HorizontalAlignment="Center" TextAlignment="Center" Margin="0,5,0,0" />
+			</StackPanel>
 
 			<controls:InventoryEntryControl
 				Grid.Row="0" Grid.RowSpan="4"
@@ -59,95 +66,160 @@
 				Image="{Binding SkinDataObject.Spray4Image, ElementName=Self}"
 				TooltipName="{Binding SkinDataObject.Spray4Name, ElementName=Self}" />
 
-			<controls:InventoryEntryControl
+			<!-- Row 1: Sidearms -->
+			<controls:WeaponInventoryControl
 				Grid.Column="2" Grid.Row="1"
-				Image="{Binding SkinDataObject.ClassicImage, ElementName=Self}"
-				TooltipName="{Binding SkinDataObject.ClassicName, ElementName=Self}" />
-			<controls:InventoryEntryControl
-				Grid.Column="2" Grid.Row="2"
-				Image="{Binding SkinDataObject.ShortyImage, ElementName=Self}"
-				TooltipName="{Binding SkinDataObject.ShortyName, ElementName=Self}" />
-			<controls:InventoryEntryControl
-				Grid.Column="2" Grid.Row="3"
-				Image="{Binding SkinDataObject.FrenzyImage, ElementName=Self}"
-				TooltipName="{Binding SkinDataObject.FrenzyName, ElementName=Self}" />
-			<controls:InventoryEntryControl
-				Grid.Column="2" Grid.Row="4"
-				Image="{Binding SkinDataObject.GhostImage, ElementName=Self}"
-				TooltipName="{Binding SkinDataObject.GhostName, ElementName=Self}" />
-			<controls:InventoryEntryControl
-				Grid.Column="2" Grid.Row="5"
-				Image="{Binding SkinDataObject.SheriffImage, ElementName=Self}"
-				TooltipName="{Binding SkinDataObject.SheriffName, ElementName=Self}" />
-
-			<controls:InventoryEntryControl
+				SkinImage="{Binding SkinDataObject.ClassicImage, ElementName=Self}"
+				SkinName="{Binding SkinDataObject.ClassicName, ElementName=Self}"
+				BuddyImage="{Binding SkinDataObject.ClassicBuddyImage, ElementName=Self}"
+				BuddyName="{Binding SkinDataObject.ClassicBuddyName, ElementName=Self}"
+				BuddyVisibility="{Binding SkinDataObject.ClassicBuddyName, ElementName=Self, Converter={converters:IsStringEmptyToVisibilityConverter}}" />
+			<controls:WeaponInventoryControl
 				Grid.Column="3" Grid.Row="1"
-				Image="{Binding SkinDataObject.StingerImage, ElementName=Self}"
-				TooltipName="{Binding SkinDataObject.StingerName, ElementName=Self}" />
-			<controls:InventoryEntryControl
-				Grid.Column="3" Grid.Row="2"
-				Image="{Binding SkinDataObject.SpectreImage, ElementName=Self}"
-				TooltipName="{Binding SkinDataObject.SpectreName, ElementName=Self}" />
-			<controls:InventoryEntryControl
-				Grid.Column="3" Grid.Row="3"
-				Image="{Binding SkinDataObject.BuckyImage, ElementName=Self}"
-				TooltipName="{Binding SkinDataObject.BuckyName, ElementName=Self}" />
-			<controls:InventoryEntryControl
-				Grid.Column="3" Grid.Row="4"
-				Image="{Binding SkinDataObject.JudgeImage, ElementName=Self}"
-				TooltipName="{Binding SkinDataObject.JudgeName, ElementName=Self}" />
-
-			<controls:InventoryEntryControl
+				SkinImage="{Binding SkinDataObject.ShortyImage, ElementName=Self}"
+				SkinName="{Binding SkinDataObject.ShortyName, ElementName=Self}"
+				BuddyImage="{Binding SkinDataObject.ShortyBuddyImage, ElementName=Self}"
+				BuddyName="{Binding SkinDataObject.ShortyBuddyName, ElementName=Self}"
+				BuddyVisibility="{Binding SkinDataObject.ShortyBuddyName, ElementName=Self, Converter={converters:IsStringEmptyToVisibilityConverter}}" />
+			<controls:WeaponInventoryControl
 				Grid.Column="4" Grid.Row="1"
-				Image="{Binding SkinDataObject.BulldogImage, ElementName=Self}"
-				TooltipName="{Binding SkinDataObject.BulldogName, ElementName=Self}" />
-			<controls:InventoryEntryControl
-				Grid.Column="4" Grid.Row="2"
-				Image="{Binding SkinDataObject.GuardianImage, ElementName=Self}"
-				TooltipName="{Binding SkinDataObject.GuardianName, ElementName=Self}" />
-			<controls:InventoryEntryControl
-				Grid.Column="4" Grid.Row="3"
-				Image="{Binding SkinDataObject.PhantomImage, ElementName=Self}"
-				TooltipName="{Binding SkinDataObject.PhantomName, ElementName=Self}" />
-			<controls:InventoryEntryControl
-				Grid.Column="4" Grid.Row="4"
-				Image="{Binding SkinDataObject.VandalImage, ElementName=Self}"
-				TooltipName="{Binding SkinDataObject.VandalName, ElementName=Self}" />
-
-			<controls:InventoryEntryControl
-				Grid.Column="5" Grid.Row="0"
-				Image="{Binding SkinDataObject.MarshalImage, ElementName=Self}"
-				TooltipName="{Binding SkinDataObject.MarshalName, ElementName=Self}" />
-
-			<controls:InventoryEntryControl
+				SkinImage="{Binding SkinDataObject.FrenzyImage, ElementName=Self}"
+				SkinName="{Binding SkinDataObject.FrenzyName, ElementName=Self}"
+				BuddyImage="{Binding SkinDataObject.FrenzyBuddyImage, ElementName=Self}"
+				BuddyName="{Binding SkinDataObject.FrenzyBuddyName, ElementName=Self}"
+				BuddyVisibility="{Binding SkinDataObject.FrenzyBuddyName, ElementName=Self, Converter={converters:IsStringEmptyToVisibilityConverter}}" />
+			<controls:WeaponInventoryControl
 				Grid.Column="5" Grid.Row="1"
-				Image="{Binding SkinDataObject.OutlawImage, ElementName=Self}"
-				TooltipName="{Binding SkinDataObject.OutlawName, ElementName=Self}" />
+				SkinImage="{Binding SkinDataObject.GhostImage, ElementName=Self}"
+				SkinName="{Binding SkinDataObject.GhostName, ElementName=Self}"
+				BuddyImage="{Binding SkinDataObject.GhostBuddyImage, ElementName=Self}"
+				BuddyName="{Binding SkinDataObject.GhostBuddyName, ElementName=Self}"
+				BuddyVisibility="{Binding SkinDataObject.GhostBuddyName, ElementName=Self, Converter={converters:IsStringEmptyToVisibilityConverter}}" />
+			<controls:WeaponInventoryControl
+				Grid.Column="6" Grid.Row="1"
+				SkinImage="{Binding SkinDataObject.SheriffImage, ElementName=Self}"
+				SkinName="{Binding SkinDataObject.SheriffName, ElementName=Self}"
+				BuddyImage="{Binding SkinDataObject.SheriffBuddyImage, ElementName=Self}"
+				BuddyName="{Binding SkinDataObject.SheriffBuddyName, ElementName=Self}"
+				BuddyVisibility="{Binding SkinDataObject.SheriffBuddyName, ElementName=Self, Converter={converters:IsStringEmptyToVisibilityConverter}}" />
 
-			<controls:InventoryEntryControl
+			<!-- Row 2: SMGs & Shotguns -->
+			<controls:WeaponInventoryControl
+				Grid.Column="2" Grid.Row="2"
+				SkinImage="{Binding SkinDataObject.StingerImage, ElementName=Self}"
+				SkinName="{Binding SkinDataObject.StingerName, ElementName=Self}"
+				BuddyImage="{Binding SkinDataObject.StingerBuddyImage, ElementName=Self}"
+				BuddyName="{Binding SkinDataObject.StingerBuddyName, ElementName=Self}"
+				BuddyVisibility="{Binding SkinDataObject.StingerBuddyName, ElementName=Self, Converter={converters:IsStringEmptyToVisibilityConverter}}" />
+			<controls:WeaponInventoryControl
+				Grid.Column="3" Grid.Row="2"
+				SkinImage="{Binding SkinDataObject.SpectreImage, ElementName=Self}"
+				SkinName="{Binding SkinDataObject.SpectreName, ElementName=Self}"
+				BuddyImage="{Binding SkinDataObject.SpectreBuddyImage, ElementName=Self}"
+				BuddyName="{Binding SkinDataObject.SpectreBuddyName, ElementName=Self}"
+				BuddyVisibility="{Binding SkinDataObject.SpectreBuddyName, ElementName=Self, Converter={converters:IsStringEmptyToVisibilityConverter}}" />
+			<controls:WeaponInventoryControl
+				Grid.Column="4" Grid.Row="2"
+				SkinImage="{Binding SkinDataObject.BuckyImage, ElementName=Self}"
+				SkinName="{Binding SkinDataObject.BuckyName, ElementName=Self}"
+				BuddyImage="{Binding SkinDataObject.BuckyBuddyImage, ElementName=Self}"
+				BuddyName="{Binding SkinDataObject.BuckyBuddyName, ElementName=Self}"
+				BuddyVisibility="{Binding SkinDataObject.BuckyBuddyName, ElementName=Self, Converter={converters:IsStringEmptyToVisibilityConverter}}" />
+			<controls:WeaponInventoryControl
 				Grid.Column="5" Grid.Row="2"
-				Image="{Binding SkinDataObject.OperatorImage, ElementName=Self}"
-				TooltipName="{Binding SkinDataObject.OperatorName, ElementName=Self}" />
+				SkinImage="{Binding SkinDataObject.JudgeImage, ElementName=Self}"
+				SkinName="{Binding SkinDataObject.JudgeName, ElementName=Self}"
+				BuddyImage="{Binding SkinDataObject.JudgeBuddyImage, ElementName=Self}"
+				BuddyName="{Binding SkinDataObject.JudgeBuddyName, ElementName=Self}"
+				BuddyVisibility="{Binding SkinDataObject.JudgeBuddyName, ElementName=Self, Converter={converters:IsStringEmptyToVisibilityConverter}}" />
 
-			<controls:InventoryEntryControl
+			<!-- Row 3: Rifles -->
+			<controls:WeaponInventoryControl
+				Grid.Column="2" Grid.Row="3"
+				SkinImage="{Binding SkinDataObject.BulldogImage, ElementName=Self}"
+				SkinName="{Binding SkinDataObject.BulldogName, ElementName=Self}"
+				BuddyImage="{Binding SkinDataObject.BulldogBuddyImage, ElementName=Self}"
+				BuddyName="{Binding SkinDataObject.BulldogBuddyName, ElementName=Self}"
+				BuddyVisibility="{Binding SkinDataObject.BulldogBuddyName, ElementName=Self, Converter={converters:IsStringEmptyToVisibilityConverter}}" />
+			<controls:WeaponInventoryControl
+				Grid.Column="3" Grid.Row="3"
+				SkinImage="{Binding SkinDataObject.GuardianImage, ElementName=Self}"
+				SkinName="{Binding SkinDataObject.GuardianName, ElementName=Self}"
+				BuddyImage="{Binding SkinDataObject.GuardianBuddyImage, ElementName=Self}"
+				BuddyName="{Binding SkinDataObject.GuardianBuddyName, ElementName=Self}"
+				BuddyVisibility="{Binding SkinDataObject.GuardianBuddyName, ElementName=Self, Converter={converters:IsStringEmptyToVisibilityConverter}}" />
+			<controls:WeaponInventoryControl
+				Grid.Column="4" Grid.Row="3"
+				SkinImage="{Binding SkinDataObject.PhantomImage, ElementName=Self}"
+				SkinName="{Binding SkinDataObject.PhantomName, ElementName=Self}"
+				BuddyImage="{Binding SkinDataObject.PhantomBuddyImage, ElementName=Self}"
+				BuddyName="{Binding SkinDataObject.PhantomBuddyName, ElementName=Self}"
+				BuddyVisibility="{Binding SkinDataObject.PhantomBuddyName, ElementName=Self, Converter={converters:IsStringEmptyToVisibilityConverter}}" />
+			<controls:WeaponInventoryControl
 				Grid.Column="5" Grid.Row="3"
-				Image="{Binding SkinDataObject.AresImage, ElementName=Self}"
-				TooltipName="{Binding SkinDataObject.AresName, ElementName=Self}" />
+				SkinImage="{Binding SkinDataObject.VandalImage, ElementName=Self}"
+				SkinName="{Binding SkinDataObject.VandalName, ElementName=Self}"
+				BuddyImage="{Binding SkinDataObject.VandalBuddyImage, ElementName=Self}"
+				BuddyName="{Binding SkinDataObject.VandalBuddyName, ElementName=Self}"
+				BuddyVisibility="{Binding SkinDataObject.VandalBuddyName, ElementName=Self, Converter={converters:IsStringEmptyToVisibilityConverter}}" />
 
-			<controls:InventoryEntryControl
+			<!-- Row 4: Snipers & Machine Guns -->
+			<controls:WeaponInventoryControl
+				Grid.Column="2" Grid.Row="4"
+				SkinImage="{Binding SkinDataObject.MarshalImage, ElementName=Self}"
+				SkinName="{Binding SkinDataObject.MarshalName, ElementName=Self}"
+				BuddyImage="{Binding SkinDataObject.MarshalBuddyImage, ElementName=Self}"
+				BuddyName="{Binding SkinDataObject.MarshalBuddyName, ElementName=Self}"
+				BuddyVisibility="{Binding SkinDataObject.MarshalBuddyName, ElementName=Self, Converter={converters:IsStringEmptyToVisibilityConverter}}" />
+			<controls:WeaponInventoryControl
+				Grid.Column="3" Grid.Row="4"
+				SkinImage="{Binding SkinDataObject.OutlawImage, ElementName=Self}"
+				SkinName="{Binding SkinDataObject.OutlawName, ElementName=Self}"
+				BuddyImage="{Binding SkinDataObject.OutlawBuddyImage, ElementName=Self}"
+				BuddyName="{Binding SkinDataObject.OutlawBuddyName, ElementName=Self}"
+				BuddyVisibility="{Binding SkinDataObject.OutlawBuddyName, ElementName=Self, Converter={converters:IsStringEmptyToVisibilityConverter}}" />
+			<controls:WeaponInventoryControl
+				Grid.Column="4" Grid.Row="4"
+				SkinImage="{Binding SkinDataObject.OperatorImage, ElementName=Self}"
+				SkinName="{Binding SkinDataObject.OperatorName, ElementName=Self}"
+				BuddyImage="{Binding SkinDataObject.OperatorBuddyImage, ElementName=Self}"
+				BuddyName="{Binding SkinDataObject.OperatorBuddyName, ElementName=Self}"
+				BuddyVisibility="{Binding SkinDataObject.OperatorBuddyName, ElementName=Self, Converter={converters:IsStringEmptyToVisibilityConverter}}" />
+			<controls:WeaponInventoryControl
 				Grid.Column="5" Grid.Row="4"
-				Image="{Binding SkinDataObject.OdinImage, ElementName=Self}"
-				TooltipName="{Binding SkinDataObject.OdinName, ElementName=Self}" />
+				SkinImage="{Binding SkinDataObject.AresImage, ElementName=Self}"
+				SkinName="{Binding SkinDataObject.AresName, ElementName=Self}"
+				BuddyImage="{Binding SkinDataObject.AresBuddyImage, ElementName=Self}"
+				BuddyName="{Binding SkinDataObject.AresBuddyName, ElementName=Self}"
+				BuddyVisibility="{Binding SkinDataObject.AresBuddyName, ElementName=Self, Converter={converters:IsStringEmptyToVisibilityConverter}}" />
 
-			<controls:InventoryEntryControl
-				Grid.Column="5" Grid.Row="5"
-				Image="{Binding SkinDataObject.MeleeImage, ElementName=Self}"
-				TooltipName="{Binding SkinDataObject.MeleeName, ElementName=Self}" />
+			<!-- Row 5: Heavy & Melee & Bandit -->
+			<controls:WeaponInventoryControl
+				Grid.Column="2" Grid.Row="5"
+				SkinImage="{Binding SkinDataObject.OdinImage, ElementName=Self}"
+				SkinName="{Binding SkinDataObject.OdinName, ElementName=Self}"
+				BuddyImage="{Binding SkinDataObject.OdinBuddyImage, ElementName=Self}"
+				BuddyName="{Binding SkinDataObject.OdinBuddyName, ElementName=Self}"
+				BuddyVisibility="{Binding SkinDataObject.OdinBuddyName, ElementName=Self, Converter={converters:IsStringEmptyToVisibilityConverter}}" />
+			<controls:WeaponInventoryControl
+				Grid.Column="3" Grid.Row="5"
+				SkinImage="{Binding SkinDataObject.MeleeImage, ElementName=Self}"
+				SkinName="{Binding SkinDataObject.MeleeName, ElementName=Self}"
+				BuddyImage="{Binding SkinDataObject.MeleeBuddyImage, ElementName=Self}"
+				BuddyName="{Binding SkinDataObject.MeleeBuddyName, ElementName=Self}"
+				BuddyVisibility="{Binding SkinDataObject.MeleeBuddyName, ElementName=Self, Converter={converters:IsStringEmptyToVisibilityConverter}}" />
+			<controls:WeaponInventoryControl
+				Grid.Column="4" Grid.Row="5"
+				SkinImage="{Binding SkinDataObject.BanditImage, ElementName=Self}"
+				SkinName="{Binding SkinDataObject.BanditName, ElementName=Self}"
+				BuddyImage="{Binding SkinDataObject.BanditBuddyImage, ElementName=Self}"
+				BuddyName="{Binding SkinDataObject.BanditBuddyName, ElementName=Self}"
+				BuddyVisibility="{Binding SkinDataObject.BanditBuddyName, ElementName=Self, Converter={converters:IsStringEmptyToVisibilityConverter}}" />
 
 			<Button
-				Grid.Row="6" Grid.Column="3" Grid.ColumnSpan="2" Cursor="Hand" Click="CloseBtnClick"
-				Template="{StaticResource ButtonTemplate}" Margin="10" Padding="20">
-				<fa6:ImageAwesome PrimaryColor="#007EF9" Icon="Solid_Xmark" Margin="10" />
+				Grid.Row="5" Grid.Column="6" Cursor="Hand" Click="CloseBtnClick"
+				Template="{StaticResource ButtonTemplate}" Margin="20" HorizontalAlignment="Center" VerticalAlignment="Center">
+				<fa6:ImageAwesome PrimaryColor="#007EF9" Icon="Solid_Xmark" Height="30" Width="30" />
 			</Button>
 
 		</Grid>

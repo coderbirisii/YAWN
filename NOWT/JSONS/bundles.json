@@ -1,0 +1,111 @@
+{
+    "endpoints": [
+        {
+            "method": "GET",
+            "name": "Bundles",
+            "url": "https://valorant-api.com/v1/bundles",
+            "description": "",
+            "parameters": [
+                {
+                    "name": "language",
+                    "type": "string",
+                    "description": "Sets the output language",
+                    "default": "en-US",
+                    "required": false
+                }
+            ],
+            "responses": [
+                {
+                    "status_code": 200,
+                    "description": "Success",
+                    "schema": [
+                        "object {2}",
+                        "status int32",
+                        "data object[] {13}",
+                        "uuid string",
+                        "displayName string (localized)",
+                        "displayNameSubText string (localized)",
+                        "description string (localized)",
+                        "extraDescription string (localized)",
+                        "promoDescription string (localized)",
+                        "useAdditionalContext boolean",
+                        "displayIcon string",
+                        "displayIcon2 string",
+                        "displayIcon3 string",
+                        "logoIcon string",
+                        "verticalPromoImage string",
+                        "assetPath string"
+                    ]
+                },
+                {
+                    "status_code": 400,
+                    "description": "Bad Request",
+                    "schema": [
+                        "object {2}",
+                        "status int32",
+                        "error string"
+                    ]
+                }
+            ],
+            "info": "Returns data and assets of all bundles"
+        },
+        {
+            "method": "GET",
+            "name": "Bundle by Uuid",
+            "url": "https://valorant-api.com/v1/bundles/{bundleUuid}",
+            "description": "",
+            "parameters": [
+                {
+                    "name": "language",
+                    "type": "string",
+                    "description": "Sets the output language",
+                    "default": "en-US",
+                    "required": false
+                }
+            ],
+            "responses": [
+                {
+                    "status_code": 200,
+                    "description": "Success",
+                    "schema": [
+                        "object {2}",
+                        "status int32",
+                        "data object[] {13}",
+                        "uuid string",
+                        "displayName string (localized)",
+                        "displayNameSubText string (localized)",
+                        "description string (localized)",
+                        "extraDescription string (localized)",
+                        "promoDescription string (localized)",
+                        "useAdditionalContext boolean",
+                        "displayIcon string",
+                        "displayIcon2 string",
+                        "displayIcon3 string",
+                        "logoIcon string",
+                        "verticalPromoImage string",
+                        "assetPath string"
+                    ]
+                },
+                {
+                    "status_code": 400,
+                    "description": "Bad Request",
+                    "schema": [
+                        "object {2}",
+                        "status int32",
+                        "error string"
+                    ]
+                },
+                {
+                    "status_code": 404,
+                    "description": "Not Found",
+                    "schema": [
+                        "object {2}",
+                        "status int32",
+                        "error string"
+                    ]
+                }
+            ],
+            "info": "Returns data and assets of the requested bundle"
+        }
+    ]
+}

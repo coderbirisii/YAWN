@@ -1,6 +1,6 @@
-﻿using Microsoft.Toolkit.Mvvm.ComponentModel;
-using Microsoft.Toolkit.Mvvm.DependencyInjection;
-using Microsoft.Toolkit.Mvvm.Input;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.DependencyInjection;
+using CommunityToolkit.Mvvm.Input;
 
 namespace NOWT.ViewModels;
 
@@ -14,25 +14,25 @@ public partial class MainViewModel : ObservableObject
         SelectedViewModel = Ioc.Default.GetRequiredService<HomeViewModel>();
     }
 
-    [ICommand]
+    [RelayCommand]
     public void NavigateHome()
     {
         SelectedViewModel = Ioc.Default.GetRequiredService<HomeViewModel>();
     }
 
-    [ICommand]
+    [RelayCommand]
     public void NavigateInfo()
     {
         SelectedViewModel = Ioc.Default.GetRequiredService<InfoViewModel>();
     }
 
-    [ICommand]
+    [RelayCommand]
     public void NavigateSettings()
     {
         SelectedViewModel = Ioc.Default.GetRequiredService<SettingsViewModel>();
     }
 
-    [ICommand]
+    [RelayCommand]
     public void NavigateMatch()
     {
         SelectedViewModel = Ioc.Default.GetRequiredService<MatchViewModel>();

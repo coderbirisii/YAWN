@@ -104,6 +104,9 @@ public class LiveMatchResponse
     [JsonPropertyName("MapID")]
     public string MapId { get; set; }
 
+    [JsonPropertyName("QueueID")]
+    public string QueueId { get; set; }
+
     [JsonPropertyName("ModeID")]
     public string ModeId { get; set; }
 
@@ -399,6 +402,9 @@ public class LoadoutLoadout
 
     [JsonPropertyName("Items")]
     public Dictionary<string, ItemValue> Items { get; set; }
+
+    [JsonPropertyName("Identity")]
+    public LoadoutIdentity Identity { get; set; }
 }
 
 public class ItemValue

@@ -1,0 +1,40 @@
+{
+    "endpoints": [
+        {
+            "method": "GET",
+            "name": "Version",
+            "url": "https://valorant-api.com/v1/version",
+            "description": "",
+            "parameters": [],
+            "responses": [
+                {
+                    "status_code": 200,
+                    "description": "Success",
+                    "schema": [
+                        "object {2}",
+                        "status int32",
+                        "data object {8}",
+                        "manifestId string",
+                        "branch string",
+                        "version string",
+                        "buildVersion string",
+                        "engineVersion string",
+                        "riotClientVersion string",
+                        "riotClientBuild string",
+                        "buildDate dateTime"
+                    ]
+                },
+                {
+                    "status_code": 404,
+                    "description": "Not Found",
+                    "schema": [
+                        "object {2}",
+                        "status int32",
+                        "error string"
+                    ]
+                }
+            ],
+            "info": "Returns data of the current manifest & version the API is running on"
+        }
+    ]
+}

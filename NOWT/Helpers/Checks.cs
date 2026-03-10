@@ -1,8 +1,9 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using RestSharp;
+using System.Diagnostics;
 
 namespace NOWT.Helpers;
 
@@ -33,11 +34,13 @@ public class Checks
 
     public static async Task<bool> CheckLocalAsync()
     {
+        if (!IsValorantRunning())
+            return false;
+
         var lockfileLocation =
             $@"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\Riot Games\Riot Client\Config\lockfile";
 
         if (!File.Exists(lockfileLocation))
-            // Constants.Log.Warning("Valorant Not detected");
             return false;
 
         string lockFileString;
@@ -60,6 +63,25 @@ public class Checks
         Constants.Port = parts[2];
         Constants.LPassword = parts[3];
         return true;
+    }
+
+    private static bool IsValorantRunning()
+    {
+        var processNames = new[]
+        {
+            "Riot Client",
+            "VALORANT-Win64-Shipping",
+            "RiotClientServices"
+        };
+
+        foreach (var name in processNames)
+        {
+            var shortName = Path.GetFileNameWithoutExtension(name);
+            if (Process.GetProcessesByName(shortName).Length > 0)
+                return true;
+        }
+
+        return false;
     }
 
     public static async Task<bool> CheckMatchAsync()

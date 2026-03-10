@@ -126,7 +126,7 @@
 				FontWeight="DemiBold"
 				FontFamily="{StaticResource Nunito}"
 				Foreground="#32e2b2"
-				Text="New Opponent Who This?"
+				Text="Yet Another Who's Next?"
 				TextWrapping="Wrap" />
 		</StackPanel>
 
