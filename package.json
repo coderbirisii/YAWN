@@ -1,7 +1,7 @@
 {
-  "name": "nowt-api-test",
+  "name": "YAWN-api-test",
   "version": "1.0.0",
-  "description": "Simple Node.js test script for NOWT Riot API functionality",
+  "description": "Simple Node.js test script for YAWN Riot API functionality",
   "main": "test.js",
   "scripts": {
     "test": "node test.js",
@@ -11,6 +11,6 @@
     "axios": "^1.6.0"
   },
   "keywords": ["riot", "valorant", "api", "test"],
-  "author": "NOWT",
+  "author": "YAWN",
   "license": "MIT"
 }

@@ -7,7 +7,7 @@ $(document).ready(function() {
   const settings = {
     "async": true,
     "crossDomain": true,
-    "url": "https://api.github.com/repos/pwall2222/NOWT/releases",
+    "url": "https://api.github.com/repos/coderbirisii/YAWN/releases",
     "method": "GET",
     "headers": {}
   };

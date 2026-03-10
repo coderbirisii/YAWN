@@ -29,7 +29,7 @@ jobs:
         run: dotnet restore
       - name: Build
         run: >
-          dotnet publish .\NOWT\NOWT.csproj
+          dotnet publish .\YAWN\YAWN.csproj
           --configuration Release
           -p:PublishSingleFile=true
           --self-contained false -r win-x64
@@ -42,11 +42,11 @@ jobs:
       - name: Download InnoSetup
         uses: pwall2222/inno-setup-download@v0.0.8
       - name: Package application
-        run: ISCC.exe ./NOWT.iss
+        run: ISCC.exe ./YAWN.iss
       - name: Rename installer
         shell: pwsh
         run: |
-          Rename-Item ./inno/out/NOWT.exe NOWT-Installer.exe
+          Rename-Item ./inno/out/YAWN.exe YAWN-Installer.exe
       - name: Get CHANGELOG
         id: changelog
         uses: requarks/changelog-action@v1.8.1
@@ -59,9 +59,9 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           files: |
-            ./inno/out/NOWT-Installer.exe
-            ./inno/NOWT.exe
+            ./inno/out/YAWN-Installer.exe
+            ./inno/YAWN.exe
           tag_name: ${{ env.TAG }}
           body: |
-            ![Release downloads](https://img.shields.io/github/downloads/pwall2222/NOWT/${{ env.TAG }}/total)
+            ![Release downloads](https://img.shields.io/github/downloads/coderbirisii/YAWN/${{ env.TAG }}/total)
             ${{ steps.changelog.outputs.changes }}

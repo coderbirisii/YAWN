@@ -1,5 +1,5 @@
 @echo off
-title NOWT Proje Derleyici
+title YAWN Proje Derleyici
 echo Proje derleniyor...
 echo.
 

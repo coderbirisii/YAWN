@@ -1,5 +1,5 @@
 @echo off
-cd /d C:\Users\Coder\Desktop\NOWT
+cd /d C:\Users\Coder\Desktop\YAWN
 
 :: Repo bazlı user/email ayarı (coderbirisii)
 git config user.name "coderbirisii"
