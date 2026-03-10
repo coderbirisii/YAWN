@@ -19,7 +19,13 @@
 
 ## ⭐ Project Stats
 
-[![Star History Chart](https://api.star-history.com/image?repos=coderbirisii/YAWN&type=date&legend=top-left)](https://www.star-history.com/?repos=coderbirisii%2FYAWN&type=date&legend=top-left)
+<div align="center">
+
+[![Star History Chart](https://api.star-history.com/svg?repos=coderbirisii/YAWN&type=Date)](https://star-history.com/#coderbirisii/YAWN&Date)
+
+![Repobeats analytics image](https://repobeats.axiom.co/api/embed/ddaa9df9a94b0029ec3fad399e1c1c4e75755477.svg "Repobeats analytics image")
+
+</div>
 
 <br />
 
