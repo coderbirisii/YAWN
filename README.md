@@ -94,10 +94,12 @@ Please check the [issues tab](https://github.com/coderbirisii/YAWN/issues) befor
 
 ## ⭐ Project Stats
 
-## Star History
+<div align="center">
 
-[![Star History Chart](https://api.star-history.com/image?repos=coderbirisii/YAWN&type=date&legend=top-left)](https://www.star-history.com/?repos=coderbirisii%2FYAWN&type=date&legend=top-left)
+[![Star History Chart](https://api.star-history.com/svg?repos=coderbirisii/YAWN&type=Date)](https://star-history.com/#coderbirisii/YAWN&Date)
 
+
+</div>
 
 ## Built With
 
