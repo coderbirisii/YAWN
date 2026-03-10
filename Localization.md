@@ -11,7 +11,7 @@ If there is already a name there, simply add yours to the end.
 - Please try to only add generic languages such as English(en) rather than English-United States(en-US)
 
 ## How to Contribute using [POEditor](https://poeditor.com/join/project?hash=eDxQpoYC9q)
-POEditor lets people collaboratively edit translations, supports auto-translations, quality checks, etc. It's very easy to use and lets me monitor/help people.
+POEditor lets people collaboratively edit translations, supports auto-translations, quality checks, etc. It's very easy to use and lets me monitor/help people. 
 ### Steps:
 - Access the website [here](https://poeditor.com/join/project?hash=eDxQpoYC9q)
 - Select the languages you want to help translate and press "Join Translation"
